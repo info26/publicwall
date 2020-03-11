@@ -1,0 +1,15 @@
+.commenta {
+  margin-right:5px;
+}
+
+.edita{
+  cursor:pointer;
+  color:blue!important;
+  text-decoration:underline!important;
+}
+
+.editcomment{
+  cursor:pointer;
+  color:blue!important;
+  text-decoration:underline!important;
+}

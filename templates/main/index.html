@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+{% block content %}
+{% if editperms == True %}
+<div class="modal fade" tabindex="-1" id="commenteditmodal" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Comment</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+                <p>Below you can edit the comment. </p>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Key</th>
+                            <th scope="col">Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>Text</th>
+                            <th>
+                                <input type="input" class="form-control" id="ctextinputedit">
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>Date</th>
+                            <th><input type="input" class="form-control" id="cdateinputedit"></th>
+                        </tr>
+                        <tr>
+                            <th>User</th>
+                            <th><input type="input" class="form-control" id="cuserinputedit"></th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button onclick="savecommentdata();" type="button" class="btn btn-primary">Save</button>
+                <button class="btn btn-danger" onclick="deletecomment();">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" id="editmodal" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Post</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+                <p>Below you can edit the post. </p>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Key</th>
+                            <th scope="col">Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>Text</th>
+                            <th>
+                                <input type="input" class="form-control" id="textinputedit">
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>Date</th>
+                            <th><input type="input" class="form-control" id="dateinputedit"></th>
+                        </tr>
+                        <tr>
+                            <th>User</th>
+                            <th><input type="input" class="form-control" id="userinputedit"></th>
+                        </tr>
+                        <tr>
+                            <th>Locked</th>
+                            <th>
+                                <div class="custom-control custom-checkbox my-1 mr-sm-2">
+                                    <input type="checkbox" class="custom-control-input" id="lockedinputedit">
+                                    <label class="text-muted custom-control-label" for="lockedinputedit">If this is checked, users without permission cannot comment on this post. </label>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>Pinned</th>
+                            <th>
+                                <div class="custom-control custom-checkbox my-1 mr-sm-2">
+                                    <input type="checkbox" class="custom-control-input" id="pinnedinputedit">
+                                    <label class="text-muted custom-control-label" for="pinnedinputedit">If this is checked, this post will be on top of non-pinned posts. </label>
+                                </div>
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button onclick="editmodalsavedata();" type="button" class="btn btn-primary">Save</button>
+                <button class="btn btn-danger" onclick="deletepost();">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+<div class="modal fade" tabindex="-1" id="usermodal" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modaltitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+                <p id="descriptiontitle"></p>
+            </div>
+            <div class="modal-footer">
+                <p class="text-muted" id="iddisplay">You're not supposed to see this. </p><button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" type="text/css" href="/static/index.css"> {% if editperms == True %}
+<link rel="stylesheet" type="text/css" href="/static/admincss.css"> {% endif %} 
+{% csrf_token %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="#">Public Wall</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {% if admin == True %}
+                    Welcome, {{userloggedin}}<span class="badge badge-secondary">Admin</span>
+                    {% else %}
+                    Welcome, {{userloggedin}}
+                    {% endif %}
+                    </a>
+
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/credits">Credits</a>
+                        <a class="dropdown-item" href="/profile">Profile</a>
+                        <a class="dropdown-item" href="/logout">Logout</a> {% if canaccessadmin == True %}
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/admin">Admin Panel</a> {% endif %}
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<br>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            {% for temp in alerts %}
+            <div class="alert alert-{{temp.1}}">
+                {{ temp.0 }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+            <form id="post">
+                <div class="form-group">
+                    <textarea class="form-control" id="post_text" placeholder="Start typing here..."></textarea>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary" id="submit-button" type="submit">Submit</button>
+                </div>
+            </form>
+
+            <hr>{{usernames}} Posts:
+            <br>
+            <hr> {% for post in pinned %}
+            <span class="postdate">{{ post.1 }}</span>
+
+            <br>
+            <span id="posttextspan{{post.3}}">{{ post.0 }}</span>
+            <br>
+            <span id="postdatespan{{post.3}}">Posted by: <a class="commenta" onclick="openProfile({{ post.4 }})">{{ post.2 }}</a></span>
+            <br>
+            <a class="commenta commenta{{post.3}}" data-id="{{ post.3 }}">
+                <i class="far fa-comments"></i> Comment [{{ post.5 }}]
+            </a>
+            {% if editperms == True %}
+            <a class="edita" data-id="{{ post.3 }}"><i class="far fa-edit"></i>Edit Post</a> {% endif %}
+            <br>
+            <div class="container-fluid">
+                <div style="display:none" data-filled="False" class="border commentdiv{{ post.3 }}"></div>
+                <div style="display:none" data-filled="False" class="border-bottom border-left border-right controlcommentdiv{{ post.3 }} commentdivcontrol"></div>
+            </div>
+            <hr> {% endfor %} {% for post in data %}
+            {% if post.6 == True %}
+            <span class="badge badge-secondary">
+                <i class="fas fa-thumbtack"></i>
+                    PINNED
+                </span>
+            {% endif %}
+            <span id="postdatespan{{post.3}}"><a class="commenta" onclick="openProfile({{ post.4 }})">{{ post.2 }}</a> said:</span><br>
+            <span class="postdate">{{ post.1 }}</span>
+            <span id="posttextspan{{post.3}}">{{ post.0 }}</span>
+            <br>
+
+            <a class="commenta commenta{{post.3}}" data-id="{{ post.3 }}">
+                <i class="far fa-comments"></i> Comment [{{ post.5 }}]
+            </a>
+            {% if editperms == True %}
+            <a class="edita" data-id="{{ post.3 }}"><i class="far fa-edit"></i>Edit Post</a> {% endif %}
+            <br>
+            <div class="container-fluid">
+                <div style="display:none" data-filled="False" class="border commentdiv{{ post.3 }}"></div>
+                <div style="display:none" data-filled="False" class="border-bottom border-left border-right controlcommentdiv{{ post.3 }} commentdivcontrol"></div>
+            </div>
+            <hr> {% endfor %}
+        </div>
+    </div>
+</div>
+<script src="/static/post.js"></script>
+{% if editperms == True %}
+    <!-- admin related functions, and AJAX calls. -->
+    <script src="/static/adminpost.js"></script>
+{% endif %}
+{% if scrolltostat == True %}
+<script>
+    $(function() {
+        setTimeout(function() {
+            $("#postdatespan{{scrolltonum}}")[0].scrollIntoViewIfNeeded();
+        }, 250)
+    });
+</script>
+{% endif %}
+{% if stcs == True %}
+<script>
+    $(function() {
+        setTimeout(function() {
+            $(".commenta{{postnum}}").click();
+        }, 1)
+        setTimeout(function() {
+            $(".userspan{{stcn}}")[0].scrollIntoViewIfNeeded();
+        }, 501)
+
+    });
+</script>
+{% endif %}
+{% endblock content %}

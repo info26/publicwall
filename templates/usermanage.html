@@ -1,0 +1,40 @@
+{% extends "base.html" %} {% block content %}
+{% csrf_token %}
+{% load tz %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>User Management Console</h1>
+            To get started, enter a user's id:
+            <form id="userlookup">
+                <input id="idfield" type="input">
+                <button type="submit">Go!</button>
+            </form>
+            <br>
+            <div style="display:none;" class="border bg-light text-dark" id="resultwell">
+                <form id="userform">
+                    <div class="form-group">
+                        <label for="usernameinput">Username</label>
+                        <input id="usernameinput" class="form-control" type="input">
+                    </div>
+                    <div class="form-group">
+                            <label for="descriptioninput">Description</label>
+                            <input id="descriptioninput" class="form-control" type="input">
+                    </div>
+                    <div class="form-group">
+                            <label for="timezoneinput">Timezone <p class="text-muted" id="curtimezone"></p></label><br>
+                                <select id="timezone" name="timezone">
+                                  {% for tz in timezones %}
+
+                                  <option value="{{ tz }}">{{ tz }}</option>
+                                  {% endfor %}
+                                  
+                                </select>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/static/usermanage.js"></script>
+{% endblock content %}
