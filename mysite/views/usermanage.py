@@ -26,3 +26,17 @@ def requestuser(request):
       return JsonResponse({"ok": False, "errorcode": "DoesNotExist"})
     referringuser = User.objects.get(pk=request.POST['id'])
     return JsonResponse({"ok": True, "username": referringuser.username, "description": referringuser.userextra.description, "timezone": referringuser.userextra.timezone, 'timezones': pytz.common_timezones})
+
+@login_required
+def saveuser(request):
+  if request.method == "POST" and request.user.has_perm('mysite.edit-user'):
+    
+    referringuser = User.objects.get(pk=request.POST['id'])
+    referringuser.username = request.POST['username']
+    referringuser.timezone = request.POST['timezone']
+    
+    referringuser.description = request.POST['description']
+    referringuser.save()
+    return JsonResponse({"ok": True})
+  else:
+    return JsonResponse({"ok": False, "error": "No permission. "})
