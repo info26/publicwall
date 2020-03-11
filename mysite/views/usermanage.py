@@ -25,7 +25,7 @@ def requestuser(request):
     if User.objects.filter(pk=request.POST['id']).exists() == False:
       return JsonResponse({"ok": False, "errorcode": "DoesNotExist"})
     referringuser = User.objects.get(pk=request.POST['id'])
-    return JsonResponse({"ok": True, "username": referringuser.username, "description": referringuser.userextra.description, {"timezone": referringuser.userextra.timezone})
+    return JsonResponse({"ok": True, "username": referringuser.username, {"description": referringuser.userextra.description, "timezone": referringuser.userextra.timezone})
 
 @login_required
 def saveuser(request):
