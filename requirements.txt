@@ -1,0 +1,5 @@
+django
+social-auth-app-django
+gunicorn
+django-heroku
+whitenoise

@@ -1,0 +1,27 @@
+{% load tz %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.12/js/select2.full.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.12/css/select2.min.css">
+</script>
+{% if error == True %}
+<p class='text-color:red;'>Invalid Timezone!</p>
+{% endif %}
+<p>Start typing to select your timezone. </p>
+<p>Your current timezone is: {{ currenttz }}</p>
+
+<form action="/timezone/" method="POST">
+    {% csrf_token %}
+    <label for="timezone">Time zone:</label>
+    <select id="timezone" name="timezone">
+      <option value="Select an option..." selected>Select an option...</option>
+        {% for tz in timezones %}
+
+        <option value="{{ tz }}">{{ tz }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit" value="Set">
+</form>
+
+<script>
+$('#timezone').select2();
+</script>

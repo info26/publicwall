@@ -1,0 +1,41 @@
+body,html{
+    height:100%;
+}
+label, p, #text {
+  color:#333333;
+}
+.overlay {
+    pointer-events: none;
+    width:100%;
+    height:100%;
+    position:absolute;
+    z-index:9999999;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+}
+a.btn.btn-primary{
+  color:white;
+}
+.commenta{
+  cursor:pointer;
+  color:blue!important;
+  text-decoration:underline!important;
+}
+.nbborder {
+  padding:5px;
+  background-color:#fafafa;
+}
+.postdate {
+  display:inline-block;
+  float:right;
+  color:#797979;
+  top:0;
+  font-size:13px;
+}
+.commentdivcontrol {
+  padding:5px;
+  background-color:#fafafa;
+}
