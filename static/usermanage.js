@@ -22,6 +22,7 @@ $("#userlookup").submit(function () {
             $("#descriptioninput").val(window.data['description']);
             $("#curtimezone").html(window.data['timezone']);
             $("#timezone").val(window.data['timezone']);
+            $("#timezone").trigger('change');
             $("#resultwell").slideDown(500);
             }, 500)
           } else {
@@ -34,17 +35,26 @@ $("#userlookup").submit(function () {
     event.preventDefault();
 });
 
-// fix after #2 is resolved. 
-// function save(){
-//   $.ajax({
-//     type: 'POST',
-//     url: '/saveuser/',
-//     data: {
-//       csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
-//       id: window.editing,
-//       username: $("#usernameinput").val(),
-//       description: $("#descriptioninput").val(),
-//       timezone: $("#curtimezone")
-//     }
-//   })
-// }
+$("#userform").submit(function (){
+  $.ajax({
+    type: 'POST',
+    url: '/saveuser/',
+    data: {
+      csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+      id: window.editing,
+      username: $("#usernameinput").val(),
+      description: $("#descriptioninput").val(),
+      timezone: $("#timezone").val()
+    },
+    success: function(data){
+      if(data['ok'] == true){
+        notify("Success!", "info")
+      } else {
+        notify(data['error'], "info")
+      }
+    }
+  });
+  event.preventDefault();
+
+});
+$('#timezone').select2();
