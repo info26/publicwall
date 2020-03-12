@@ -18,7 +18,7 @@ import hashlib
 @login_required
 def usermanage(request):
   if request.user.has_perm('mysite.edit-user'):
-    return render(request, 'usermanage.html', 'timezones': pytz.common_timezones)
+    return render(request, 'usermanage.html', {'timezones': pytz.common_timezones})
 @login_required
 def requestuser(request):
   if request.method == "POST" and request.user.has_perm("mysite.edit-user"):
