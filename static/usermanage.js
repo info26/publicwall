@@ -5,7 +5,7 @@
 
 
 $("#userlookup").submit(function () {
-    window.editing = $("#idfield").val();
+    
     $.ajax({
         type: 'POST',
         url: '/requestuser/',
@@ -15,6 +15,8 @@ $("#userlookup").submit(function () {
         },
         success: function (data) {
           if(data['ok'] == true){
+            //only set if user exists. 
+            window.editing = $("#idfield").val();
             window.data = data
             $("#resultwell").slideUp(500);
             setTimeout(function(){
