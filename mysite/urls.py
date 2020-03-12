@@ -25,5 +25,6 @@ urlpatterns = [
   path('requestuser/', views.requestuser),
   url(r'^oauth/', include('social_django.urls', namespace='social')),
   path('new-user/', views.newuser),
-  path('deletecomment/', views.deletecomment)
+  path('deletecomment/', views.deletecomment),
+  path('saveuser/', views.saveuser)
 ]
