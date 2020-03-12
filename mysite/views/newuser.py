@@ -25,8 +25,9 @@ def newuser(request):
         b = User.objects.filter(username = request.POST['username']).exists()
         if b:
           return JsonResponse({"ok": False, "error": "Sorry, the username is taken. "})
-        user = User.objects.create_user(username=request.POST['username'],email=request.POST['email'])
-        user.set_unusable_password()
+        user = User.objects.create(username=request.POST['username'],email=request.POST['email'])
+        user.set_password(request.POST['password'])
+        user.save()
         return JsonResponse({"ok": True})
       else:
         return JsonResponse({"ok": False, "error": "Invalid code!"})
@@ -47,7 +48,7 @@ def checkValidCode(code, willbeused):
   #check if it is expired
   if e.expires != None:
 
-    if e.expires > tzz.now():
+    if e.expires < tzz.now():
       e.delete()
       return False
   if willbeused:
