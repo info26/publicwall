@@ -33,9 +33,9 @@ def saveuser(request):
     
     referringuser = User.objects.get(pk=request.POST['id'])
     referringuser.username = request.POST['username']
-    referringuser.timezone = request.POST['timezone']
+    referringuser.userextra.timezone = request.POST['timezone']
     
-    referringuser.description = request.POST['description']
+    referringuser.userextra.description = request.POST['description']
     referringuser.save()
     return JsonResponse({"ok": True})
   else:
