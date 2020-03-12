@@ -46,6 +46,7 @@ def home(request):
     stcn = -1 # the number(id) comment we should scroll to.
     postnum = -1 # the postnumbebr
     userloggedin = request.user.username
+    canedituser = request.user.has_perm('mysite.edit-user')
     if 'loggedin' in request.GET and request.GET['loggedin'] == "1": # if user just logged in V
       alerts.append(["successfully logged in", "primary"]) # show an alert that they just logged in ^
     if 'scrollto' in request.GET: # execute the following if we are scrolling to a post. 
@@ -65,7 +66,7 @@ def home(request):
       loc = i.date.astimezone(timezone)
       dateformatted = loc.strftime("%b %d %Y %H:%M:%S")
       data.append([i.post_content, dateformatted, User.objects.get(pk=i.user).username, i.id, i.user, len(i.comment_set.all()), i.pinned])
-    return render(request, 'main/index.html', {'data': data, 'userloggedin':userloggedin, 'canaccessadmin': canaccessadmin, 'alerts': alerts, 'editperms':editperms, 'scrolltostat':scrolltostat, 'scrolltonum':scrolltonum, 'stcs': stcs, 'stcn': stcn, 'postnum': postnum})
+    return render(request, 'main/index.html', {'data': data, 'userloggedin':userloggedin, 'canaccessadmin': canaccessadmin, 'alerts': alerts, 'editperms':editperms, 'scrolltostat':scrolltostat, 'scrolltonum':scrolltonum, 'stcs': stcs, 'stcn': stcn, 'postnum': postnum, 'canedituser':canedituser})
   else:
     return redirect("/user-login/")
 @login_required
