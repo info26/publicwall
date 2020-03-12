@@ -12,51 +12,31 @@ from django.utils import timezone as tzz
 import pytz
 from pytz import *
 import hashlib
-@login_required
-def profile(request):
-  if request.user.is_authenticated == False:
-    return redirect('/user-login/')
-  if 'timezone' in request.GET and request.GET['timezone'] == "1":
-    timezone = True
-  else:
-    timezone = False
-  if 'set' in request.GET and request.GET['set'] == "1":
-    set = True
-  else:
-    set = False
-  return render(request, "main/profile.html", {'set': set, 'timezone' : timezone, 'username':request.user.username, 'description': request.user.userextra.description})
-  pass
+
+#i plan to work on this usermanagement a lot. 
 
 @login_required
-def set_timezone(request):
-  if request.method == 'POST':
-    if request.POST['timezone'] not in pytz.common_timezones:
-      return redirect('/timezone?error=1')
-    request.user.userextra.timezone = request.POST['timezone']
-    request.user.userextra.save()
-    return redirect('/profile?set=1')
-  else:
-    error = False
-    if 'error' in request.GET and request.GET['error'] == '1':
-      error = True
-    return render(request, 'timezone_set.html', {'timezones': pytz.common_timezones, 'currenttz': request.user.userextra.timezone, 'error': error})
+def usermanage(request):
+  if request.user.has_perm('mysite.edit-user'):
+    return render(request, 'usermanage.html', 'timezones': pytz.common_timezones)
+@login_required
+def requestuser(request):
+  if request.method == "POST" and request.user.has_perm("mysite.edit-user"):
+    if User.objects.filter(pk=request.POST['id']).exists() == False:
+      return JsonResponse({"ok": False, "errorcode": "DoesNotExist"})
+    referringuser = User.objects.get(pk=request.POST['id'])
+    return JsonResponse({"ok": True, "username": referringuser.username, "description": referringuser.userextra.description, "timezone": referringuser.userextra.timezone})
 
 @login_required
-def save_profile(request):
-  if request.method == 'POST':
-    b = User.objects.filter(username = request.POST['username']).exists()
-    if b and User.objects.filter(username = request.POST['username'])[0].id != request.user.id:
-      return JsonResponse({"ok": False, "error":"This username is taken!"})
-    request.user.username = request.POST['username']
-    request.user.save()
-    request.user.userextra.description = request.POST['description']
-    request.user.userextra.save()
+def saveuser(request):
+  if request.method == "POST" and request.user.has_perm('mysite.edit-user'):
+    
+    referringuser = User.objects.get(pk=request.POST['id'])
+    referringuser.username = request.POST['username']
+    referringuser.timezone = request.POST['timezone']
+    
+    referringuser.description = request.POST['description']
+    referringuser.save()
     return JsonResponse({"ok": True})
-@login_required
-def view_user_profile(request, user):
-  referringuser = User.objects.get(pk=user)
-  username = referringuser.username
-  description = referringuser.userextra.description
-  idd = referringuser.id
-  return JsonResponse({"ok": True,"username": username, "description": description, "id":idd})
-  pass
+  else:
+    return JsonResponse({"ok": False, "error": "No permission. "})

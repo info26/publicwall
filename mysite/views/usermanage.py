@@ -18,11 +18,25 @@ import hashlib
 @login_required
 def usermanage(request):
   if request.user.has_perm('mysite.edit-user'):
-    return render(request, 'usermanage.html')
+    return render(request, 'usermanage.html', {'timezones': pytz.common_timezones})
 @login_required
 def requestuser(request):
   if request.method == "POST" and request.user.has_perm("mysite.edit-user"):
     if User.objects.filter(pk=request.POST['id']).exists() == False:
       return JsonResponse({"ok": False, "errorcode": "DoesNotExist"})
     referringuser = User.objects.get(pk=request.POST['id'])
-    return JsonResponse({"ok": True, "username": referringuser.username, "description": referringuser.userextra.description, "timezone": referringuser.userextra.timezone, 'timezones': pytz.common_timezones})
+    return JsonResponse({"ok": True, "username": referringuser.username, "description": referringuser.userextra.description, "timezone": referringuser.userextra.timezone})
+
+@login_required
+def saveuser(request):
+  if request.method == "POST" and request.user.has_perm('mysite.edit-user'):
+    
+    referringuser = User.objects.get(pk=request.POST['id'])
+    referringuser.username = request.POST['username']
+    referringuser.userextra.timezone = request.POST['timezone']
+    
+    referringuser.userextra.description = request.POST['description']
+    referringuser.save()
+    return JsonResponse({"ok": True})
+  else:
+    return JsonResponse({"ok": False, "error": "No permission. "})
