@@ -3,7 +3,7 @@ import datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
-from mysite.models import *
+from publicwall.models import *
 from django.contrib.auth import authenticate as auth_login
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
@@ -17,11 +17,11 @@ import hashlib
 
 @login_required
 def usermanage(request):
-  if request.user.has_perm('mysite.edit-user'):
+  if request.user.has_perm('publicwall.edit-user'):
     return render(request, 'usermanage.html', {'timezones': pytz.common_timezones})
 @login_required
 def requestuser(request):
-  if request.method == "POST" and request.user.has_perm("mysite.edit-user"):
+  if request.method == "POST" and request.user.has_perm("publicwall.edit-user"):
     if User.objects.filter(pk=request.POST['id']).exists() == False:
       return JsonResponse({"ok": False, "errorcode": "DoesNotExist"})
     referringuser = User.objects.get(pk=request.POST['id'])
@@ -29,7 +29,7 @@ def requestuser(request):
 
 @login_required
 def saveuser(request):
-  if request.method == "POST" and request.user.has_perm('mysite.edit-user'):
+  if request.method == "POST" and request.user.has_perm('publicwall.edit-user'):
     
     referringuser = User.objects.get(pk=request.POST['id'])
     referringuser.username = request.POST['username']

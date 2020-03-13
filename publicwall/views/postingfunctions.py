@@ -3,7 +3,7 @@ import datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
-from mysite.models import *
+from publicwall.models import *
 from django.contrib.auth import authenticate as auth_login
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
@@ -38,7 +38,7 @@ def home(request):
 
     data = [] # data - not pinned posts.    userloggedin = request.user.username # the username of the user logged in.
     canaccessadmin = request.user.is_staff # if the user can access the admin panel '/admin'
-    editperms = request.user.has_perm("mysite.edit-post") # if the user has edit perms
+    editperms = request.user.has_perm("publicwall.edit-post") # if the user has edit perms
     alerts = [] # alerts
     scrolltostat = False # if we should scroll to a post
     scrolltonum = -1 # the number we should scroll to ^
@@ -46,7 +46,7 @@ def home(request):
     stcn = -1 # the number(id) comment we should scroll to.
     postnum = -1 # the postnumbebr
     userloggedin = request.user.username
-    canedituser = request.user.has_perm('mysite.edit-user')
+    canedituser = request.user.has_perm('publicwall.edit-user')
     if 'loggedin' in request.GET and request.GET['loggedin'] == "1": # if user just logged in V
       alerts.append(["successfully logged in", "primary"]) # show an alert that they just logged in ^
     if 'scrollto' in request.GET: # execute the following if we are scrolling to a post. 
@@ -76,11 +76,11 @@ def handlepost(request):
     if len(Post.objects.filter(user = request.user.id)) > 0:
       latestpost = Post.objects.filter(user = request.user.id).latest('date')
       delta =  tzz.now()-latestpost.date
-      if delta < datetime.timedelta(minutes = 2) and (request.user.has_perm('mysite.bypass-time-restriction') == False):
+      if delta < datetime.timedelta(minutes = 2) and (request.user.has_perm('publicwall.bypass-time-restriction') == False):
         return JsonResponse({"ok": False, "error":"You are posting too soon!"})
     if request.POST['post_text'] == "":
       return JsonResponse({"ok": False, "error":"Post cannot be blank."})
-    elif not request.user.has_perm('mysite.post-post'):
+    elif not request.user.has_perm('publicwall.post-post'):
       return JsonResponse({"ok": False, "error":"No Permission"})
     else:
       q = Post(post_content=request.POST['post_text'], date = tzz.now(), user=request.user.id, pinned=False, locked=False)
