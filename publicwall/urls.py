@@ -1,6 +1,6 @@
 from django.conf.urls import url, include
 from django.contrib import admin
-from mysite import views
+from publicwall import views
 from django.urls import path
 
 urlpatterns = [
