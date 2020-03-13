@@ -1,3 +1,2 @@
-# public wall
-Just a simple public wall, built in django. 
-this edit is also just a test edit for git. 
+# Welcome!
+This django project is a "posting system" (can't find an appropriate word)
