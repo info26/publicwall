@@ -3,7 +3,7 @@ import datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
-from mysite.models import *
+from publicwall.models import *
 from django.contrib.auth import authenticate as auth_login
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
