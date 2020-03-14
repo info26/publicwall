@@ -60,7 +60,7 @@ class Migration(migrations.Migration):
                 ('comment_content', models.TextField()),
                 ('date', models.DateTimeField()),
                 ('user', models.IntegerField(null=True)),
-                ('post', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mysite.Post')),
+                ('post', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='publicwall.Post')),
             ],
             options={
                 'permissions': [('make-comment', 'Ability to make a comment.'), ('bypass-lock', 'Ability to bypass a lock on a post. ')],
