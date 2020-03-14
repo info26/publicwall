@@ -188,25 +188,7 @@
 
             <hr>{{usernames}} Posts:
             <br>
-            <hr> {% for post in pinned %}
-            <span class="postdate">{{ post.1 }}</span>
-
-            <br>
-            <span id="posttextspan{{post.3}}">{{ post.0 }}</span>
-            <br>
-            <span id="postdatespan{{post.3}}">Posted by: <a class="commenta" onclick="openProfile({{ post.4 }})">{{ post.2 }}</a></span>
-            <br>
-            <a class="commenta commenta{{post.3}}" data-id="{{ post.3 }}">
-                <i class="far fa-comments"></i> Comment [{{ post.5 }}]
-            </a>
-            {% if editperms == True %}
-            <a class="edita" data-id="{{ post.3 }}"><i class="far fa-edit"></i>Edit Post</a> {% endif %}
-            <br>
-            <div class="container-fluid">
-                <div style="display:none" data-filled="False" class="border commentdiv{{ post.3 }}"></div>
-                <div style="display:none" data-filled="False" class="border-bottom border-left border-right controlcommentdiv{{ post.3 }} commentdivcontrol"></div>
-            </div>
-            <hr> {% endfor %} {% for post in data %}
+			{% for post in data %}
             {% if post.6 == True %}
             <span class="badge badge-secondary">
                 <i class="fas fa-thumbtack"></i>
