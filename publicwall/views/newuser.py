@@ -6,12 +6,13 @@ from django.template import loader
 from publicwall.models import *
 from django.contrib.auth import authenticate as auth_login
 from django.contrib.auth import login, logout
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
 from django.db.models import Q
 from django.utils import timezone as tzz
 import pytz
 from pytz import *
 import hashlib
+from django.conf import settings
 
 #no login required. 
 def newuser(request):
@@ -27,6 +28,12 @@ def newuser(request):
           return JsonResponse({"ok": False, "error": "Sorry, the username is taken. "})
         user = User.objects.create(username=request.POST['username'],email=request.POST['email'])
         user.set_password(request.POST['password'])
+        userperms = []
+        reqperms = settings.DEFAULTPERMISSIONS
+        for i in reqperms:
+          temp = Permission.objects.filter(codename=i)[0]
+          userperms.append(temp)
+        user.user_permissions.set(userperms)
         user.save()
         return JsonResponse({"ok": True})
       else:
