@@ -1,7 +1,0 @@
-
-
-build:
-    stage: build
-    script:
-        - git remote add https://github.com/info26/publicwall.git
-        - git push
