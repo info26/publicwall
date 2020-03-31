@@ -1,4 +1,3 @@
-
 push:
     stage: push
     script:
