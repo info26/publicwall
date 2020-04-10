@@ -43,7 +43,7 @@ def home(request):
     pinned = [] # pinned - pinned posts
     userloggedin = request.user.username # the username of the user logged in.
     canaccessadmin = request.user.is_staff # if the user can access the admin panel '/admin'
-    editperms = request.user.has_perm("mysite.edit-post") # if the user has edit perms
+    editperms = request.user.has_perm("publicwall.edit-post") # if the user has edit perms
     alerts = [] # alerts
     scrolltostat = False # if we should scroll to a post
     scrolltonum = -1 # the number we should scroll to ^
@@ -79,11 +79,11 @@ def handlepost(request):
     if len(Post.objects.filter(user = request.user.id)) > 0:
       latestpost = Post.objects.filter(user = request.user.id).latest('date')
       delta =  tzz.now()-latestpost.date
-      if delta < datetime.timedelta(minutes = 2) and (request.user.has_perm('mysite.bypass-time-restriction') == False):
+      if delta < datetime.timedelta(minutes = 2) and (request.user.has_perm('publicwall.bypass-time-restriction') == False):
         return JsonResponse({"ok": False, "error":"You are posting too soon!"})
     if request.POST['post_text'] == "":
       return JsonResponse({"ok": False, "error":"Post cannot be blank."})
-    elif not request.user.has_perm('mysite.post-post'):
+    elif not request.user.has_perm('publicwall.post-post'):
       return JsonResponse({"ok": False, "error":"No Permission"})
     else:
       q = Post(post_content=request.POST['post_text'], date = tzz.now(), user=request.user.id, pinned=False, locked=False)
@@ -126,11 +126,11 @@ def printcomments(request):
         data.append({"user": User.objects.get(pk=i.user).username, "text": i.comment_content, "date": dateformat, 'id':i.id})
     except:
       pass
-    if request.user.has_perm('mysite.bypass-lock') == False:
+    if request.user.has_perm('publicwall.bypass-lock') == False:
       postlocked = Post.objects.get(pk=request.POST['commentid']).locked
     else:
       postlocked = False
-    if request.user.has_perm('mysite.edit-post'):
+    if request.user.has_perm('publicwall.edit-post'):
       editpost = True
     else:
       editpost = False
@@ -140,9 +140,9 @@ def handlecomment(request):
   if request.method == "GET":
     return HttpResponse("500 Bad Method")
   elif request.method == "POST":
-    if request.user.has_perm("mysite.make-comment"):
+    if request.user.has_perm("publicwall.make-comment"):
       if Post.objects.get(pk=request.POST['postid']).locked == True:
-        if request.user.has_perm('mysite.bypass-lock') == False:
+        if request.user.has_perm('publicwall.bypass-lock') == False:
           return JsonResponse({"ok": False, "error": "This post is locked. "})
       if request.POST['commenttext'] == "":
         return JsonResponse({"ok": False, "error":"Comment cannot be blank"})
@@ -162,7 +162,7 @@ def error418(request):
 def getpostinfo(request):
   #be sure to check if the user has permission to edit posts as this SHOULD (not can) be used when the user is editing someone and to prevent unauthorized people from using this. 
   # okay, we have some problems with timezones so we are going to pause this for now. FIXED
-  if request.user.has_perm("mysite.edit-post"):
+  if request.user.has_perm("publicwall.edit-post"):
     referringpost = Post.objects.get(pk = request.POST['postid'])
     return JsonResponse({"ok": True, "text": referringpost.post_content, "date":referringpost.date, "user": referringpost.user, "pinned":referringpost.pinned, "locked": referringpost.locked})
   else:
@@ -170,7 +170,7 @@ def getpostinfo(request):
   pass
 def savepostinfo(request):
   # YOU ABSOLUTELY NEED TO CHECK IF THE USER HAS PERMIISONS.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  if request.user.has_perm("mysite.edit-post"):
+  if request.user.has_perm("publicwall.edit-post"):
     referringpost = Post.objects.get(pk = request.POST['postid'])
     referringpost.post_content = request.POST["text"]
     referringpost.date = request.POST["date"]
@@ -186,7 +186,7 @@ def savepostinfo(request):
 @login_required
 def deletepost(request):
   #check for permissions
-  if request.user.has_perm("mysite.edit-post"):
+  if request.user.has_perm("publicwall.edit-post"):
     referringpost = Post.objects.get(pk = request.POST['postid'])
     referringpost.delete();
     return JsonResponse({"ok": True})
@@ -240,13 +240,13 @@ def view_user_profile(request, user):
 #here are functions for modifying comments.
 @login_required
 def getcommentinfo(request):
-  if request.method == 'POST' and request.user.has_perm("mysite.edit-post"):
+  if request.method == 'POST' and request.user.has_perm("publicwall.edit-post"):
     referringcomment = Comment.objects.get(pk=request.POST["commentid"])
     return JsonResponse({"ok" : True, "user": referringcomment.user, "date": referringcomment.date, "content":referringcomment.comment_content})
   pass
 @login_required
 def savecommentinfo(request):
-  if request.method == 'POST' and request.user.has_perm('mysite.edit-post'):
+  if request.method == 'POST' and request.user.has_perm('publicwall.edit-post'):
     referringcomment = Comment.objects.get(pk=request.POST["commentid"])
     # pick up here. 
     referringcomment.comment_content = request.POST["content"]
@@ -263,11 +263,11 @@ def savecommentinfo(request):
 #user management functions
 @login_required
 def usermanage(request):
-  if request.user.has_perm('mysite.edit-user'):
+  if request.user.has_perm('publicwall.edit-user'):
     return render(request, 'usermanage.html')
 @login_required
 def requestuser(request):
-  if request.method == "POST" and request.user.has_perm("mysite.edit-user"):
+  if request.method == "POST" and request.user.has_perm("publicwall.edit-user"):
     if User.objects.filter(pk=request.POST['id']).exists() == False:
       return JsonResponse({"ok": False, "errorcode": "DoesNotExist"})
     referringuser = User.objects.get(pk=request.POST['id'])
