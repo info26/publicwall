@@ -87,10 +87,10 @@ WSGI_APPLICATION = 'publicwall.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'd225qc89egdeab',
-        'USER': 'uzweervuljddrp',
-        'PASSWORD': '58c7d0073135b7edf20e45073128aade19fea8411fc88973f013d0129051047e',
-        'HOST': 'ec2-18-210-51-239.compute-1.amazonaws.com',
+        'NAME': 'db29e6a409ap08',
+        'USER': 'cxfulskhthklzz',
+        'PASSWORD': 'd937300443db7188eb203fe877194668a6f6f5284492d6c8cae6a083ab72168d',
+        'HOST': 'ec2-34-192-30-15.compute-1.amazonaws.com',
         'PORT': '5432',
     }
 }
