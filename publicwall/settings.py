@@ -85,14 +85,19 @@ WSGI_APPLICATION = 'publicwall.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': 'db29e6a409ap08',
+    #     'USER': 'cxfulskhthklzz',
+    #     'PASSWORD': 'd937300443db7188eb203fe877194668a6f6f5284492d6c8cae6a083ab72168d',
+    #     'HOST': 'ec2-34-192-30-15.compute-1.amazonaws.com',
+    #     'PORT': '5432',
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'db29e6a409ap08',
-        'USER': 'cxfulskhthklzz',
-        'PASSWORD': 'd937300443db7188eb203fe877194668a6f6f5284492d6c8cae6a083ab72168d',
-        'HOST': 'ec2-34-192-30-15.compute-1.amazonaws.com',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
+
 }
 
 

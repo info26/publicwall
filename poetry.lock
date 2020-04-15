@@ -3,8 +3,8 @@ category = "main"
 description = "ASGI specs, helper code, and adapters"
 name = "asgiref"
 optional = false
-python-versions = "*"
-version = "3.2.3"
+python-versions = ">=3.5"
+version = "3.2.7"
 
 [[package]]
 category = "main"
@@ -12,7 +12,18 @@ description = "Python package for providing Mozilla's CA Bundle."
 name = "certifi"
 optional = false
 python-versions = "*"
-version = "2019.11.28"
+version = "2020.4.5.1"
+
+[[package]]
+category = "main"
+description = "Foreign Function Interface for Python calling C code."
+name = "cffi"
+optional = false
+python-versions = "*"
+version = "1.14.0"
+
+[package.dependencies]
+pycparser = "*"
 
 [[package]]
 category = "main"
@@ -21,6 +32,18 @@ name = "chardet"
 optional = false
 python-versions = "*"
 version = "3.0.4"
+
+[[package]]
+category = "main"
+description = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
+name = "cryptography"
+optional = false
+python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*"
+version = "2.9"
+
+[package.dependencies]
+cffi = ">=1.8,<1.11.3 || >1.11.3"
+six = ">=1.4.1"
 
 [[package]]
 category = "main"
@@ -37,7 +60,7 @@ description = "A high-level Python Web framework that encourages rapid developme
 name = "django"
 optional = false
 python-versions = ">=3.6"
-version = "3.0.2"
+version = "3.0.5"
 
 [package.dependencies]
 asgiref = ">=3.2,<4.0"
@@ -59,6 +82,14 @@ name = "oauthlib"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "3.1.0"
+
+[[package]]
+category = "main"
+description = "C parser in Python"
+name = "pycparser"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "2.20"
 
 [[package]]
 category = "main"
@@ -140,10 +171,11 @@ description = "Python social authentication made simple."
 name = "social-auth-core"
 optional = false
 python-versions = "*"
-version = "3.2.0"
+version = "3.3.3"
 
 [package.dependencies]
 PyJWT = ">=1.4.0"
+cryptography = ">=1.4"
 oauthlib = ">=1.0.3"
 requests = ">=2.9.1"
 requests-oauthlib = ">=0.6.1"
@@ -163,7 +195,7 @@ description = "Non-validating SQL parser"
 name = "sqlparse"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "0.3.0"
+version = "0.3.1"
 
 [[package]]
 category = "main"
@@ -178,13 +210,16 @@ content-hash = "a786dc3058cf91165fcfefeebaca33b1297f66e3307412031c598ffa0e356fa0
 python-versions = "^3.7"
 
 [metadata.hashes]
-asgiref = ["7e06d934a7718bf3975acbf87780ba678957b87c7adc056f13b6215d610695a0", "ea448f92fc35a0ef4b1508f53a04c4670255a3f33d22a81c8fc9c872036adbe5"]
-certifi = ["017c25db2a153ce562900032d5bc68e9f191e44e9a0f762f373977de9df1fbb3", "25b64c7da4cd7479594d035c08c2d809eb4aab3a26e5a990ea98cc450c320f1f"]
+asgiref = ["8036f90603c54e93521e5777b2b9a39ba1bad05773fcf2d208f0299d1df58ce5", "9ca8b952a0a9afa61d30aa6d3d9b570bb3fd6bafcf7ec9e6bed43b936133db1c"]
+certifi = ["1d987a998c75633c40847cc966fcf5904906c920a7f17ef374f5aa4282abd304", "51fcb31174be6e6664c5f69e3e1691a2d72a1a12e90f872cbdb1567eb47b6519"]
+cffi = ["001bf3242a1bb04d985d63e138230802c6c8d4db3668fb545fb5005ddf5bb5ff", "00789914be39dffba161cfc5be31b55775de5ba2235fe49aa28c148236c4e06b", "028a579fc9aed3af38f4892bdcc7390508adabc30c6af4a6e4f611b0c680e6ac", "14491a910663bf9f13ddf2bc8f60562d6bc5315c1f09c704937ef17293fb85b0", "1cae98a7054b5c9391eb3249b86e0e99ab1e02bb0cc0575da191aedadbdf4384", "2089ed025da3919d2e75a4d963d008330c96751127dd6f73c8dc0c65041b4c26", "2d384f4a127a15ba701207f7639d94106693b6cd64173d6c8988e2c25f3ac2b6", "337d448e5a725bba2d8293c48d9353fc68d0e9e4088d62a9571def317797522b", "399aed636c7d3749bbed55bc907c3288cb43c65c4389964ad5ff849b6370603e", "3b911c2dbd4f423b4c4fcca138cadde747abdb20d196c4a48708b8a2d32b16dd", "3d311bcc4a41408cf5854f06ef2c5cab88f9fded37a3b95936c9879c1640d4c2", "62ae9af2d069ea2698bf536dcfe1e4eed9090211dbaafeeedf5cb6c41b352f66", "66e41db66b47d0d8672d8ed2708ba91b2f2524ece3dee48b5dfb36be8c2f21dc", "675686925a9fb403edba0114db74e741d8181683dcf216be697d208857e04ca8", "7e63cbcf2429a8dbfe48dcc2322d5f2220b77b2e17b7ba023d6166d84655da55", "8a6c688fefb4e1cd56feb6c511984a6c4f7ec7d2a1ff31a10254f3c817054ae4", "8c0ffc886aea5df6a1762d0019e9cb05f825d0eec1f520c51be9d198701daee5", "95cd16d3dee553f882540c1ffe331d085c9e629499ceadfbda4d4fde635f4b7d", "99f748a7e71ff382613b4e1acc0ac83bf7ad167fb3802e35e90d9763daba4d78", "b8c78301cefcf5fd914aad35d3c04c2b21ce8629b5e4f4e45ae6812e461910fa", "c420917b188a5582a56d8b93bdd8e0f6eca08c84ff623a4c16e809152cd35793", "c43866529f2f06fe0edc6246eb4faa34f03fe88b64a0a9a942561c8e22f4b71f", "cab50b8c2250b46fe738c77dbd25ce017d5e6fb35d3407606e7a4180656a5a6a", "cef128cb4d5e0b3493f058f10ce32365972c554572ff821e175dbc6f8ff6924f", "cf16e3cf6c0a5fdd9bc10c21687e19d29ad1fe863372b5543deaec1039581a30", "e56c744aa6ff427a607763346e4170629caf7e48ead6921745986db3692f987f", "e577934fc5f8779c554639376beeaa5657d54349096ef24abe8c74c5d9c117c3", "f2b0fa0c01d8a0c7483afd9f31d7ecf2d71760ca24499c8697aeb5ca37dc090c"]
 chardet = ["84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae", "fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691"]
+cryptography = ["0cacd3ef5c604b8e5f59bf2582c076c98a37fe206b31430d0cd08138aff0986e", "192ca04a36852a994ef21df13cca4d822adbbdc9d5009c0f96f1d2929e375d4f", "19ae795137682a9778892fb4390c07811828b173741bce91e30f899424b3934d", "1b9b535d6b55936a79dbe4990b64bb16048f48747c76c29713fea8c50eca2acf", "2a2ad24d43398d89f92209289f15265107928f22a8d10385f70def7a698d6a02", "3be7a5722d5bfe69894d3f7bbed15547b17619f3a88a318aab2e37f457524164", "49870684da168b90110bbaf86140d4681032c5e6a2461adc7afdd93be5634216", "587f98ce27ac4547177a0c6fe0986b8736058daffe9160dcf5f1bd411b7fbaa1", "5aca6f00b2f42546b9bdf11a69f248d1881212ce5b9e2618b04935b87f6f82a1", "6b744039b55988519cc183149cceb573189b3e46e16ccf6f8c46798bb767c9dc", "6b91cab3841b4c7cb70e4db1697c69f036c8bc0a253edc0baa6783154f1301e4", "7598974f6879a338c785c513e7c5a4329fbc58b9f6b9a6305035fca5b1076552", "7a279f33a081d436e90e91d1a7c338553c04e464de1c9302311a5e7e4b746088", "95e1296e0157361fe2f5f0ed307fd31f94b0ca13372e3673fa95095a627636a1", "9fc9da390e98cb6975eadf251b6e5fa088820141061bf041cd5c72deba1dc526", "cc20316e3f5a6b582fc3b029d8dc03aabeb645acfcb7fc1d9848841a33265748", "d1bf5a1a0d60c7f9a78e448adcb99aa101f3f9588b16708044638881be15d6bc", "ed1d0760c7e46436ec90834d6f10477ff09475c692ed1695329d324b2c5cd547", "ef9a55013676907df6c9d7dd943eb1770d014f68beaa7e73250fb43c759f4585"]
 defusedxml = ["6687150770438374ab581bb7a1b327a847dd9c5749e396102de3fad4e8a3ef93", "f684034d135af4c6cbb949b8a4d2ed61634515257a67299e5f940fbaa34377f5"]
-django = ["4f2c913303be4f874015993420bf0bd8fd2097a9c88e6b49c6a92f9bdd3fb13a", "8c3575f81e11390893860d97e1e0154c47512f180ea55bd84ce8fa69ba8051ca"]
+django = ["642d8eceab321ca743ae71e0f985ff8fdca59f07aab3a9fb362c617d23e33a76", "d4666c2edefa38c5ede0ec1655424c56dc47ceb04b6d8d62a7eac09db89545c1"]
 idna = ["7588d1c14ae4c77d74036e8c22ff447b26d0fde8f007354fd48a7814db15b7cb", "a068a21ceac8a4d63dbfd964670474107f541babbd2250d61922f029858365fa"]
 oauthlib = ["bee41cc35fcca6e988463cacc3bcb8a96224f470ca547e697b604cc697b2f889", "df884cd6cbe20e32633f1db1072e9356f53638e4361bef4e8b03c9127c9328ea"]
+pycparser = ["2d475327684562c3a96cc71adf7dc8c4f0565175cf86b6d7a404ff4c771f15f0", "7582ad22678f0fcd81102833f60ef8d0e57288b6b5fb00323d101be910e35705"]
 pyjwt = ["5c6eca3c2940464d106b99ba83b00c6add741c9becaec087fb7ccdefea71350e", "8d59a976fb773f3e6a39c85636357c4f0e242707394cadadd9814f5cbaa20e96"]
 python3-openid = ["0086da6b6ef3161cfe50fb1ee5cceaf2cda1700019fda03c2c5c440ca6abe4fa", "628d365d687e12da12d02c6691170f4451db28d6d68d050007e4a40065868502"]
 pytz = ["1c557d7d0e871de1f5ccd5833f60fb2550652da6be2693c1e02300743d21500d", "b02c06db6cf09c12dd25137e563b31700d3b80fcc4ad23abb7a315f2789819be"]
@@ -192,6 +227,6 @@ requests = ["43999036bfa82904b6af1d99e4882b560e5e2c68e5c4b0aa03b655f3d7d73fee", 
 requests-oauthlib = ["7f71572defaecd16372f9006f33c2ec8c077c3cfa6f5911a9a90202beb513f3d", "b4261601a71fd721a8bd6d7aa1cc1d6a8a93b4a9f5e96626f8e4d91e8beeaa6a", "fa6c47b933f01060936d87ae9327fead68768b69c6c9ea2109c48be30f2d4dbc"]
 six = ["236bdbdce46e6e6a3d61a337c0f8b763ca1e8717c03b369e87a7ec7ce1319c0a", "8f3cd2e254d8f793e7f3d6d9df77b92252b52637291d0f0da013c76ea2724b6c"]
 social-auth-app-django = ["6d0dd18c2d9e71ca545097d57b44d26f59e624a12833078e8e52f91baf849778", "9237e3d7b6f6f59494c3b02e0cce6efc69c9d33ad9d1a064e3b2318bcbe89ae3", "f151396e5b16e2eee12cd2e211004257826ece24fc4ae97a147df386c1cd7082"]
-social-auth-core = ["47cd2458c8fefd02466b0c514643e02ad8b61d8b4b69f7573e80882e3a97b0f0", "8320666548a532eb158968eda542bbe1863682357c432d8c4e28034a7f1e3b58", "d81ed681e3c0722300b61a0792c5db5d21206793f95ca810f010c1cc931c8d89"]
-sqlparse = ["40afe6b8d4b1117e7dff5504d7a8ce07d9a1b15aeeade8a2d10f130a834f8177", "7c3dca29c022744e95b547e867cee89f4fce4373f3549ccd8797d8eb52cdb873"]
+social-auth-core = ["21c0639c56befd33ec162c2210d583bb1de8e1136d53b21bafb96afaf2f86c91", "2f6ce1af8ec2b2cc37b86d647f7d4e4292f091ee556941db34b1e0e2dee77fc0", "4a3cdf69c449b235cdabd54a1be7ba3722611297e69fded52e3584b1a990af25"]
+sqlparse = ["022fb9c87b524d1f7862b3037e541f68597a730a8843245c349fc93e1643dc4e", "e162203737712307dfe78860cc56c8da8a852ab2ee33750e33aeadf38d12c548"]
 urllib3 = ["2f3db8b19923a873b3e5256dc9c2dedfa883e33d87c690d9c7913e1f40673cdc", "87716c2d2a7121198ebcb7ce7cccf6ce5e9ba539041cfbaeecfb641dc0bf6acc"]
