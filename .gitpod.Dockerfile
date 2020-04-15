@@ -5,7 +5,7 @@ USER gitpod
 # Install custom tools, runtime, etc. using apt-get
 # For example, the command below would install "bastet" - a command line tetris clone:
 #
-RUN sudo apt install git && curl -s https://api.github.com/repos/mozilla/geckodriver/releases/latest \
+RUN sudo apt install git && curl -s https://api.github.com/repos/cli/cli/releases/latest \
   | grep browser_download_url \
   | grep linux64 \
   | cut -d '"' -f 4 \
