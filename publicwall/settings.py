@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,7 +23,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'b#s*_o(3t3ai_k(c5po@h7a=nj5#vjkd3u7ckhnx@)mi=8fn67'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+if os.getenv("debug") == "true":
+
+  DEBUG = True
+else:
+  DEBUG = False
 
 ALLOWED_HOSTS = ['https://django-public-wall.herokuapp.com/']
 
@@ -85,19 +90,7 @@ WSGI_APPLICATION = 'publicwall.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    #     'NAME': 'db29e6a409ap08',
-    #     'USER': 'cxfulskhthklzz',
-    #     'PASSWORD': 'd937300443db7188eb203fe877194668a6f6f5284492d6c8cae6a083ab72168d',
-    #     'HOST': 'ec2-34-192-30-15.compute-1.amazonaws.com',
-    #     'PORT': '5432',
-    # }
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-
+    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
 }
 
 
