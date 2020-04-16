@@ -27,7 +27,7 @@ if os.getenv("debug") == "true":
 
   DEBUG = True
 else:
-  DEBUG - False
+  DEBUG = False
 
 ALLOWED_HOSTS = ['https://django-public-wall.herokuapp.com/']
 
