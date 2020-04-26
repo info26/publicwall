@@ -48,7 +48,7 @@ def home(request):
     userloggedin = request.user.username
     canedituser = request.user.has_perm('publicwall.edit-user')
     if 'loggedin' in request.GET and request.GET['loggedin'] == "1": # if user just logged in V
-      alerts.append(["successfully logged in", "primary"]) # show an alert that they just logged in ^
+      alerts.append(["Successfully logged in", "primary"]) # show an alert that they just logged in ^
     if 'scrollto' in request.GET: # execute the following if we are scrolling to a post. 
       scrolltostat = True # then set the var to true, to indicate that we are scrolling to a post
       scrolltonum = request.GET["scrollto"] # and set the id. 
