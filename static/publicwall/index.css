@@ -1,0 +1,7 @@
+.float-right {
+    display:inline-block;
+    float:right;
+    color:#797979;
+    top:0;
+    font-size:13px;
+}

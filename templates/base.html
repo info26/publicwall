@@ -10,21 +10,32 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0/css/all.min.css">
-    <!-- PNotify Files -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> {# Pnotify css #}
+    <link rel="stylesheet" href="/static/pnotify/pnotify.css">
+    <link rel="stylesheet" href="/static/pnotify/material.css">
 
 </head>
 
 <body>
-    Hello World!
 
+    {% block content %}{% endblock content %} {# Pnotify js #}
     <script src="/static/pnotify/pnotify.js"></script>
-    <link rel="stylesheet" href="/static/pnotify/pnotify.css">
-    <link rel="stylesheet" href="/static/pnotify/material.css">
+
     <script>
-        // the follow configures pnotify to use the material theme. 
-        PNotify.defaults.styling = "material"
-        PNotify.defaults.icons = "material"
+        // the following configures pnotify to use the material theme. 
+        PNotify.defaults.styling = "material";
+        PNotify.defaults.icons = "material";
+        // Change PNotify to modeless mode. 
+        PNotify.defaultStack.close(true);
+        PNotify.defaultStack.maxOpen = Infinity;
+        PNotify.defaultStack.modal = false;
+
+        function notify(msg) {
+            PNotify.notice({
+                title: 'Uh oh!',
+                text: msg,
+                delay: 5000
+            });
+        }
     </script>
 </body>
