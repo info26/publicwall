@@ -4,4 +4,8 @@
     color:#797979;
     top:0;
     font-size:13px;
-}
+}.link{
+    cursor:pointer;
+    color:blue!important;
+    text-decoration:underline!important;
+  }

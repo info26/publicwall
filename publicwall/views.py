@@ -20,6 +20,8 @@ def index(request):
                 "user": User.objects.filter(pk=post.user)[0].username,
                 "pinned": post.pinned,
                 "locked": post.locked,
+                'comments': len(post.comment_set.all()),
+                "id": post.id,
                 })
             
         for post in Post.objects.filter(pinned=False):
@@ -29,6 +31,8 @@ def index(request):
                 "user": User.objects.filter(pk=post.user)[0].username,
                 "pinned": post.pinned,
                 "locked": post.locked,
+                'comments': len(post.comment_set.all()),
+                "id": post.id,
                 })
             
         return JsonResponse({"posts": posts})
@@ -40,4 +44,4 @@ def index(request):
         return redirect('/acc/login')
     # We will continue serving this page. 
     # TODO: Make home page which shows the current posts. 
-    return render(request, 'publicwall/index.html', {'posts': Post.objects.all(), "e": {'e':'af'}})
+    return render(request, 'publicwall/index.html', {'posts': Post.objects.all()})
