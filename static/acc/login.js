@@ -16,7 +16,7 @@ $("#login-form").submit(function() {
                 location.href = "/?loggedin=1"
             }
             if (data["correct"] == false) {
-                notify("This username / password combo is incorrect. ")
+                commons.notify({type: NOTICE_TYPES.ERROR, title: "Uh oh!", msg: "Your password or username is incorrect", delay: 5000})
             }
         },
     });
