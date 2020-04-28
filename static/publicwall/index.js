@@ -72,8 +72,14 @@ $(function(){
                 postcommenttext = document.createTextNode("Comments[" + data["posts"][post]["comments"] + "]")
                 postcommentlink.appendChild(postcommenttext);
                 postcommentlink.setAttribute("id", "postcomment" + data["posts"][post]["id"])
-                postcommentlink.setAttribute("class", "link")
+                postcommentlink.setAttribute("class", "link editcomment")
+                postcommentlink.setAttribute("data-id", data["posts"][post]["id"])
 
+                // Div for the comment box
+                postcommentdiv = document.createElement("div")
+                postcommentdiv.setAttribute("data-id", data["posts"][post]["id"]);
+                postcommentdiv.setAttribute("data-loaded", false);
+                postcommentdiv.style.height = "0%";
 
                 // Appends everything
                 postele.appendChild(posttext);
@@ -81,11 +87,22 @@ $(function(){
                 postele.appendChild(br);
                 postele.appendChild(postauthor);
                 postele.appendChild(postcommentlink);
+                postele.appendChild(postcommentdiv)
                 postele.appendChild(hr)
                 
                 // Appends the prepared element into the DOM tree. 
                 $("#content").append(postele);
             }
+            //Call to continue initialization. 
+            continueInit();
         },
     });
 });
+function continueInit(){
+    $(".editcomment").click(function(){
+        if ($(this).attr("loaded") == true) {
+        } else {
+        }
+
+    });
+}
