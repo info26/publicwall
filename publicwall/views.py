@@ -10,7 +10,7 @@ from django.utils import timezone as tzz
 from . import admin
 
 def index(request):
-    if request.method == "POST" and request.POST['action'] == "getposts":
+    if request.method == "POST" and request.POST['action'] == "getinfo":
         # Client asking for posts. 
         posts = []
         for post in Post.objects.filter(pinned=True):
@@ -34,8 +34,19 @@ def index(request):
                 'comments': len(post.comment_set.all()),
                 "id": post.id,
                 })
+        return JsonResponse({"posts": posts, "tz": request.user.userextra.timezone})
+    if request.method == "POST" and request.POST['action'] == "getcomments":
+        refpost = Post.objects.get(pk=request.POST['postid'])
+        comments = []
+        for comment in refpost.comment_set.all():
+            comments.append({
+                "content": comment.comment_content,
+                "date": comment.date,
+                "user": User.objects.filter(pk=comment.user)[0].username,
+            })
+        return JsonResponse({"comments": comments})
             
-        return JsonResponse({"posts": posts})
+        
     # First, we check if the user is logged in or not. 
     # If not, we won't display the index page. 
     # We will redirect user to login page instead. 

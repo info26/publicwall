@@ -22,10 +22,11 @@ $(function(){
         url: "",
         data: {
             csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
-            action: "getposts"
+            action: "getinfo"
         },
         success: function(data) {
-
+            // write user's tz
+            window.tz = data["tz"];
             for (post in data["posts"]) {
                 br = document.createElement("br")
                 br.setAttribute("class", "float-right")
@@ -50,7 +51,8 @@ $(function(){
                 // The date of the post
                 // --------------------
                 postdate = document.createElement("span");
-                postdatetext = document.createTextNode(data["posts"][post]["date"])
+                localized = commons.localizeTime(data["posts"][post]["date"], window.tz);
+                postdatetext = document.createTextNode(localized.format(settings.DATE_FORMAT))
                 postdate.appendChild(postdatetext)
                 postdate.setAttribute("id", "postdate" + data["posts"][post]["id"])
                 postdate.setAttribute("class", "float-right")
@@ -79,6 +81,7 @@ $(function(){
                 postcommentdiv = document.createElement("div")
                 postcommentdiv.setAttribute("data-id", data["posts"][post]["id"]);
                 postcommentdiv.setAttribute("data-loaded", false);
+                postcommentdiv.setAttribute("id", "commentbox" + data["posts"][post]["id"])
                 postcommentdiv.style.height = "0%";
 
                 // Appends everything
@@ -102,6 +105,58 @@ function continueInit(){
     $(".editcomment").click(function(){
         if ($(this).attr("loaded") == true) {
         } else {
+            // Get comments from server!
+            $.ajax({
+                type: 'POST',
+                url: '',
+                // passing data-id to the success func. 
+                commentId: $(this).attr("data-id"),
+                data: {
+                    csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                    action: "getcomments",
+                    postid: $(this).attr("data-id"),
+                },
+                success: function(data) {
+                    for (comment in data["comments"]) {
+                        br = document.createElement("br")
+                        hr = document.createElement("hr")
+
+
+
+                        commentBox = $("#commentbox" + this.commentId)[0];
+
+
+                        // Text of comment
+                        // ---------------
+                        commenttext = document.createElement("span")
+                        commenttextnode = document.createTextNode(data["comments"][comment]["content"]);
+                        commenttext.appendChild(commenttextnode);
+                        
+
+
+                        // Date of comment
+                        commentdate = document.createElement("span");
+                        localized = commons.localizeTime(data["comments"][comment]["date"], window.tz);
+                        commentdatetext = document.createTextNode(localized.format(settings.DATE_FORMAT));
+                        commentdate.appendChild(commentdatetext)
+
+
+                        // Author of comment
+                        commentauthor = document.createElement("span")
+                        commentauthornode = document.createTextNode(data["comments"][comment]["content"]);
+                        commentauthor.appendChild(commentauthornode);
+
+                        // append everything
+                        commentBox.appendChild(commenttext);
+                        commentBox.appendChild(commentdate);
+                        commentBox.appendChild(br);
+                        commentBox.appendChild(commentauthor);
+                        commentBox.appendChild(hr);
+
+
+                    }
+                }
+            });
         }
 
     });

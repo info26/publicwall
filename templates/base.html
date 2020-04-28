@@ -13,6 +13,9 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> {# Pnotify css #}
     <link rel="stylesheet" href="/static/pnotify/pnotify.css">
     <link rel="stylesheet" href="/static/pnotify/material.css">
+    <script src="/static/moment/moment.js"></script>
+    <script src="/static/moment/timezone.js"></script>
+    <script src="/static/commons/commons.js"></script>
 
 </head>
 
@@ -22,20 +25,6 @@
     <script src="/static/pnotify/pnotify.js"></script>
 
     <script>
-        // the following configures pnotify to use the material theme. 
-        PNotify.defaults.styling = "material";
-        PNotify.defaults.icons = "material";
-        // Change PNotify to modeless mode. 
-        PNotify.defaultStack.close(true);
-        PNotify.defaultStack.maxOpen = Infinity;
-        PNotify.defaultStack.modal = false;
 
-        function notify(msg) {
-            PNotify.notice({
-                title: 'Uh oh!',
-                text: msg,
-                delay: 5000
-            });
-        }
     </script>
 </body>
