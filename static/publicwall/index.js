@@ -74,15 +74,17 @@ $(function(){
                 postcommenttext = document.createTextNode("Comments[" + data["posts"][post]["comments"] + "]")
                 postcommentlink.appendChild(postcommenttext);
                 postcommentlink.setAttribute("id", "postcomment" + data["posts"][post]["id"])
-                postcommentlink.setAttribute("class", "link editcomment")
+                postcommentlink.setAttribute("class", "link showcomments")
                 postcommentlink.setAttribute("data-id", data["posts"][post]["id"])
 
                 // Div for the comment box
                 postcommentdiv = document.createElement("div")
                 postcommentdiv.setAttribute("data-id", data["posts"][post]["id"]);
-                postcommentdiv.setAttribute("data-loaded", false);
+                postcommentdiv.setAttribute("loaded", false);
                 postcommentdiv.setAttribute("id", "commentbox" + data["posts"][post]["id"])
                 postcommentdiv.style.height = "0%";
+                postcommentdiv.style.display = "none";
+                postcommentdiv.setAttribute("class", "commentbox");
 
                 // Appends everything
                 postele.appendChild(posttext);
@@ -102,15 +104,28 @@ $(function(){
     });
 });
 function continueInit(){
-    $(".editcomment").click(function(){
-        if ($(this).attr("loaded") == true) {
+    // register hook for when 
+    $(".showcomments").click(function(){
+        // TODO: Clean this up!
+        commentBox = $("#commentbox" + $(this).attr("data-id"));
+        if (commentBox.attr("loaded") == "true") {
+            // Ok, just open and close this then. 
+            if (commentBox.attr("shown") == "true") {
+                // close the box
+                commentBox.slideUp(settings.TOGGLE_SPEED)
+                commentBox.attr("shown", "false")
+            } else if (commentBox.attr("shown") == "false") {
+                // open the box
+                commentBox.slideDown(settings.TOGGLE_SPEED)
+                commentBox.attr("shown", "true")
+            }
         } else {
             // Get comments from server!
             $.ajax({
                 type: 'POST',
                 url: '',
                 // passing data-id to the success func. 
-                commentId: $(this).attr("data-id"),
+                postid: $(this).attr("data-id"),
                 data: {
                     csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
                     action: "getcomments",
@@ -123,13 +138,14 @@ function continueInit(){
 
 
 
-                        commentBox = $("#commentbox" + this.commentId)[0];
+                        commentBox = $("#commentbox" + this.postid)[0];
 
 
                         // Text of comment
                         // ---------------
                         commenttext = document.createElement("span")
                         commenttextnode = document.createTextNode(data["comments"][comment]["content"]);
+                        commenttext.setAttribute("id", "commenttext" + data["comments"][comment]["id"])
                         commenttext.appendChild(commenttextnode);
                         
 
@@ -138,12 +154,14 @@ function continueInit(){
                         commentdate = document.createElement("span");
                         localized = commons.localizeTime(data["comments"][comment]["date"], window.tz);
                         commentdatetext = document.createTextNode(localized.format(settings.DATE_FORMAT));
+                        commentdate.setAttribute("id", "commentdate" + data["comments"][comment]["id"])
                         commentdate.appendChild(commentdatetext)
 
 
                         // Author of comment
                         commentauthor = document.createElement("span")
                         commentauthornode = document.createTextNode(data["comments"][comment]["content"]);
+                        commentauthor.setAttribute("id", "commentauthor" + data["comments"][comment]["id"])
                         commentauthor.appendChild(commentauthornode);
 
                         // append everything
@@ -152,9 +170,17 @@ function continueInit(){
                         commentBox.appendChild(br);
                         commentBox.appendChild(commentauthor);
                         commentBox.appendChild(hr);
-
-
                     }
+                    // Create textbox for adding comment
+                    commentInputBox = document.createElement("textarea");
+                    // set style
+                    commentInputBox.setAttribute("class", "form-control");
+                    commentInputBox.setAttribute("id", "textInput" + this.postid)
+                    $("#commentbox" + this.postid)[0].appendChild(commentInputBox)
+
+                    $("#commentbox" + this.postid).slideDown(settings.TOGGLE_SPEED);
+                    $("#commentbox" + this.postid).attr("shown", "true");
+                    $("#commentbox" + this.postid).attr("loaded", "true");
                 }
             });
         }

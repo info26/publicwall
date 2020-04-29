@@ -1,12 +1,13 @@
-const NOTICE_TYPES = {
-    NOTICE: "notice",
-    INFO: "info",
-    SUCCESS: "success",
-    ERROR: "error"
+class NOTICE_TYPES {
+    static NOTICE =  "notice";
+    static INFO = "info";
+    static SUCCESS = "success";
+    static ERROR = "error";
 }
 
 class settings {
     static DATE_FORMAT = "YYYYMMDD hh:mm:ssa";
+    static TOGGLE_SPEED = 500;
 }
 class commons {
     static notify(specs){

@@ -34,7 +34,10 @@ def index(request):
                 'comments': len(post.comment_set.all()),
                 "id": post.id,
                 })
-        return JsonResponse({"posts": posts, "tz": request.user.userextra.timezone})
+        return JsonResponse({
+            "posts": posts, 
+            "tz": request.user.userextra.timezone
+            })
     if request.method == "POST" and request.POST['action'] == "getcomments":
         refpost = Post.objects.get(pk=request.POST['postid'])
         comments = []
@@ -43,8 +46,11 @@ def index(request):
                 "content": comment.comment_content,
                 "date": comment.date,
                 "user": User.objects.filter(pk=comment.user)[0].username,
+                "id": comment.id
+                })
+        return JsonResponse({
+            "comments": comments
             })
-        return JsonResponse({"comments": comments})
             
         
     # First, we check if the user is logged in or not. 
@@ -55,4 +61,8 @@ def index(request):
         return redirect('/acc/login')
     # We will continue serving this page. 
     # TODO: Make home page which shows the current posts. 
-    return render(request, 'publicwall/index.html', {'posts': Post.objects.all()})
+    return render(request, 
+    'publicwall/index.html', 
+    {
+        'posts': Post.objects.all()
+    })

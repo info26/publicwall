@@ -4,8 +4,14 @@
     color:#797979;
     top:0;
     font-size:13px;
-}.link{
+}
+.link{
     cursor:pointer;
     color:blue!important;
     text-decoration:underline!important;
   }
+.commentbox{
+  background-color: lightgrey;
+  padding-left: 43px;
+  padding-right: 43px;
+}
