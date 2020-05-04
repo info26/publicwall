@@ -1,6 +1,8 @@
-# NOTE: Everything is the same here; make changes if needed. 
-
 from django.db import models
+
+# Create your models here.
+
+
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save, pre_delete
@@ -16,9 +18,12 @@ class UserExtra(models.Model):
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         UserExtra.objects.create(user=instance)
+
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.userextra.save()
+
+
 
 class Post(models.Model):
   post_content = models.TextField(default=None)

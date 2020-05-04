@@ -1,30 +1,14 @@
-from django.conf.urls import url, include
+# URLS Config
+# NOTE: This is the base urls.py !!
+
 from django.contrib import admin
-from publicwall import views
-from django.urls import path
+from django.urls import path, include
+# Import this app's own views. 
+from . import views
 
 urlpatterns = [
-  path('admin/', admin.site.urls),
-  path('', views.home),
-  path("post-post/", views.handlepost),
-  path("user-login/", views.handlelogin),
-  path('logout/', views.logoutuser),
-  path('make-comment/', views.handlecomment),
-  path('get-comments/', views.printcomments),
-  path("getpostinfo/", views.getpostinfo),
-  path('savepostinfo/', views.savepostinfo),
-  path('deletepost/', views.deletepost),
-  path('profile/', views.profile),
-  path('timezone/', views.set_timezone),
-  path('save-profile/', views.save_profile),
-  path('user-profile/<int:user>/', views.view_user_profile),
-  path('getcommentinfo/', views.getcommentinfo),
-  path('savecommentinfo/', views.savecommentinfo),
-  path('usermanage/', views.usermanage),
-  path('credits/', views.credits),
-  path('requestuser/', views.requestuser),
-  url(r'^oauth/', include('social_django.urls', namespace='social')),
-  path('new-user/', views.newuser),
-  path('deletecomment/', views.deletecomment),
-  path('saveuser/', views.saveuser)
+    path('admin/', admin.site.urls),
+    path('', views.index),
+    # Bind urls for authentication:
+    path('acc/', include('acc.urls')),
 ]

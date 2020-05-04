@@ -4,7 +4,7 @@ from .postedit import *
 from .commenthandler import *
 from .portfolio import *
 from .commentedit import *
-from .usermanage import *
+# from .usermanage import *
 from .newuser import *
 
 # BIG FAT REMIDNER, FOR ME TO THINK ABOUT FLAIRS, AND HOW TO APPLY THEM. 
