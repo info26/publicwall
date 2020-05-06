@@ -1,7 +1,7 @@
 .float-right {
     display:inline-block;
     float:right;
-    color:#797979;
+    /* color:#797979; */
     top:0;
     font-size:13px;
 }
@@ -14,4 +14,8 @@
   background-color: lightgrey;
   padding-left: 43px;
   padding-right: 43px;
+}
+
+.grey {
+  color: #797979;
 }

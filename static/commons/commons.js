@@ -7,7 +7,14 @@ class NOTICE_TYPES {
 
 class settings {
     static DATE_FORMAT = "YYYYMMDD hh:mm:ssa";
-    static TOGGLE_SPEED = 500;
+    static TOGGLE_SPEED = 250;
+    static COMMENT_PLACEHOLDER = "Post a new comment...";
+    static POST_PLACEHOLDER = "Make a new post...";
+    static CREATE_COMMENT_TEXT = "Submit";
+    static POST_LOCKED_PLACEHOLDER = "This post is locked...";
+
+    static POST_LOCKED_POPOVER_TITLE = "Post is locked";
+    static POST_LOCKED_POPOVER_CONTENT = "Please contact an administrator to unlock this post. ";
 }
 class commons {
     static notify(specs){
@@ -48,10 +55,10 @@ class commons {
     }
 }
 $(function(){
-    // the following configures pnotify to use the material theme. 
+    // the following configures pnotify to use the material theme.
     PNotify.defaults.styling = "material";
     PNotify.defaults.icons = "material";
-    // Change PNotify to modeless mode. 
+    // Change PNotify to modeless mode.
     PNotify.defaultStack.close(true);
     PNotify.defaultStack.maxOpen = Infinity;
     PNotify.defaultStack.modal = false;

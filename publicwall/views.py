@@ -11,9 +11,10 @@ from . import admin
 
 def index(request):
     if request.method == "POST" and request.POST['action'] == "getinfo":
-        # Client asking for posts. 
+        # Client asking for posts.
         posts = []
-        for post in Post.objects.filter(pinned=True):
+        # Get pinned posts that and order them by date.
+        for post in Post.objects.filter(pinned=True).order_by('-date'):
             posts.append({
                 "date": post.date,
                 "content": post.post_content,
@@ -22,8 +23,8 @@ def index(request):
                 "locked": post.locked,
                 'comments': len(post.comment_set.all()),
                 "id": post.id,
-                })
-            
+            })
+
         for post in Post.objects.filter(pinned=False):
             posts.append({
                 "date": post.date,
@@ -33,11 +34,12 @@ def index(request):
                 "locked": post.locked,
                 'comments': len(post.comment_set.all()),
                 "id": post.id,
-                })
-        return JsonResponse({
-            "posts": posts, 
-            "tz": request.user.userextra.timezone
             })
+        return JsonResponse({
+            "posts": posts,
+            "tz": request.user.userextra.timezone,
+            "username": request.user.username,
+        })
     if request.method == "POST" and request.POST['action'] == "getcomments":
         refpost = Post.objects.get(pk=request.POST['postid'])
         comments = []
@@ -47,22 +49,23 @@ def index(request):
                 "date": comment.date,
                 "user": User.objects.filter(pk=comment.user)[0].username,
                 "id": comment.id
-                })
-        return JsonResponse({
-            "comments": comments
             })
-            
-        
-    # First, we check if the user is logged in or not. 
-    # If not, we won't display the index page. 
-    # We will redirect user to login page instead. 
+        return JsonResponse({
+            "comments": comments,
+            "locked": Post.objects.get(pk=request.POST['postid']).locked,
+        })
+
+
+    # First, we check if the user is logged in or not.
+    # If not, we won't display the index page.
+    # We will redirect user to login page instead.
     if not request.user.is_authenticated:
         # Redirect this user:
         return redirect('/acc/login')
-    # We will continue serving this page. 
-    # TODO: Make home page which shows the current posts. 
-    return render(request, 
-    'publicwall/index.html', 
+    # We will continue serving this page.
+    # TODO: Make home page which shows the current posts.
+    return render(request,
+    'publicwall/index.html',
     {
         'posts': Post.objects.all()
     })
