@@ -10,8 +10,10 @@ class UserExtra(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     description = models.TextField(default="", null=True)
     timezone = models.TextField(default=None, null=True)
-    class Meta:
-      permissions = [("edit-user", "Edit a user's properties")]
+    # class Meta:
+    #   permissions = [
+    #     ("edit-user", "Edit a user's properties")
+    #   ]
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
@@ -29,7 +31,11 @@ class Post(models.Model):
   def __str__(self):
     return self.post_content
   class Meta:
-    permissions = [("post-post", "Ability to add a post. "), ("bypass-time-restriction", "can bypass time restriction"), ("edit-post", "Can use editing post modal. ")]
+    permissions = [
+      ("add-post", "Ability to add a post. "), 
+      ("bypass-time-restriction", "can bypass time restriction"), 
+      ("edit-post", "Can use editing post modal. ")
+    ]
 
 class Comment(models.Model):
   post = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -39,7 +45,10 @@ class Comment(models.Model):
   def __str__(self):
     return self.comment_content
   class Meta:
-    permissions = [("make-comment", "Ability to make a comment."),("bypass-lock", "Ability to bypass a lock on a post. ")]
+    permissions = [
+      ("add-comment", "Ability to make a comment."),
+      ("bypass-lock", "Ability to bypass a lock on a post. ")
+    ]
 
 class UserCode(models.Model):
   code = models.TextField(default=None)
@@ -49,5 +58,7 @@ class UserCode(models.Model):
   
   def __str__(self):
     return self.code
-  class Meta:
-    permissions = [("make-code", "ability to make a user registration code. ")]
+  # class Meta:
+  #   permissions = [
+  #     ("add-code", "ability to make a user registration code. ")
+  #   ]

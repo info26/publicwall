@@ -38,7 +38,9 @@ $(function () {
 
             for (post in data["posts"]) {
                 br = document.createElement("br")
-                br.setAttribute("class", "grey float-right")
+                // floating a br right causes problems
+                // in firefox. 
+                br.setAttribute("class", "grey")
                 hr = document.createElement("hr")
 
                 // Main post element
@@ -90,6 +92,7 @@ $(function () {
                 // div for everything under post.
                 postunderdiv = document.createElement("div");
                 postunderdiv.setAttribute("id", "postUnder" + data["posts"][post]["id"]);
+                postunderdiv.setAttribute("class", "postUnder");
                 postunderdiv.style.height = "0%";
                 postunderdiv.style.display = "none";
 
@@ -267,13 +270,12 @@ function postComment(button) {
 
     // Make new comment element.
 
-
+    /* PostId needed to determine text */
     postId = parseInt($(button).attr("data-post-id"));
 
-
+    /* Text needed here to determine post validity */
     text = $("#textInput" + postId).val();
-    date = new Date();
-    author = window.username;
+
     //TODO: Actually AJAX server!
     id = 0;
 
@@ -290,49 +292,88 @@ function postComment(button) {
     }
 
 
+    /* Start actually processing this request */
+    $.ajax({
+        type: 'POST',
+        url: '',
+        data: {
+            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+            action: 'addcomment',
+            postId: parseInt($(button).attr("data-post-id")),
+            text: $("#textInput" + postId).val()
+        },
+        commentData: {
+            postId: parseInt($(button).attr("data-post-id")),
+            text: $("#textInput" + postId).val(),
+            date: new Date(),
+            /* author = window.username, */
+            /* Not needed because the code can retrieve username from the */
+            /* window object.                                             */
+        },
+        success: function (data) {
+            if (data["ok"]) {
+                /* Yay, this post has cleared. */
+                /* Nothing to do here!         */
+            }
+            else {
+                /* Looks like the post has failed! */
 
 
-    // The below is the same comment renderer used for other comments too!
-    br = document.createElement("br")
-    hr = document.createElement("hr")
+                /* the two checks that are implemented are the locked post and blank      */
+                /* comment check.                                                         */
+                /* and that check is implemented on the users's side as well as the       */
+                /* on the server side. If the user is tampering around with the code      */
+                /* just fail silently. (that's what they get when they tamper with code)  */
 
 
-    commentBox = $("#commentbox" + postId)[0];
+            }
+            // The below is the same comment renderer used for other comments too!
+            br = document.createElement("br")
+            hr = document.createElement("hr")
 
 
-    // Text of comment
-    // ---------------
-    commenttext = document.createElement("span")
-    commenttextnode = document.createTextNode(text);
-    commenttext.setAttribute("id", "commenttext" + id)
-    commenttext.appendChild(commenttextnode);
+            commentBox = $("#commentbox" + this.commentData["postId"])[0];
+
+
+            // Text of comment
+            // ---------------
+            commenttext = document.createElement("span")
+            commenttextnode = document.createTextNode(this.commentData["text"]);
+            commenttext.setAttribute("id", "commenttext" + id)
+            commenttext.appendChild(commenttextnode);
 
 
 
-    // Date of comment
-    commentdate = document.createElement("span");
-    localized = commons.localizeTime(date, window.tz);
-    commentdatetext = document.createTextNode(localized.format(settings.DATE_FORMAT));
-    commentdate.setAttribute("id", "commentdate" + id);
-    commentdate.setAttribute("class", "grey float-right")
-    commentdate.appendChild(commentdatetext)
+            // Date of comment
+            commentdate = document.createElement("span");
+            localized = commons.localizeTime(this.commentData["date"], window.tz);
+            commentdatetext = document.createTextNode(localized.format(settings.DATE_FORMAT));
+            commentdate.setAttribute("id", "commentdate" + id);
+            commentdate.setAttribute("class", "grey float-right")
+            commentdate.appendChild(commentdatetext)
 
 
-    // Author of comment
-    commentauthor = document.createElement("span")
-    commentauthornode = document.createTextNode(author);
-    commentauthor.setAttribute("id", "commentauthor" + id)
-    commentauthor.setAttribute("class", "grey float-right")
-    commentauthor.appendChild(commentauthornode);
+            // Author of comment
+            commentauthor = document.createElement("span")
+            commentauthornode = document.createTextNode(window.username);
+            commentauthor.setAttribute("id", "commentauthor" + id)
+            commentauthor.setAttribute("class", "grey float-right")
+            commentauthor.appendChild(commentauthornode);
 
-    // append everything
-    commentBox.appendChild(commenttext);
-    commentBox.appendChild(commentdate);
-    commentBox.appendChild(br);
-    commentBox.appendChild(commentauthor);
-    commentBox.appendChild(hr);
+            // append everything
+            commentBox.appendChild(commenttext);
+            commentBox.appendChild(commentdate);
+            commentBox.appendChild(br);
+            commentBox.appendChild(commentauthor);
+            commentBox.appendChild(hr);
 
-    $("#commentBox" + postId);
+            $("#commentBox" + this.commentData["postId"]);
+        }
+    });
+
+
+
+
 
 
 }
