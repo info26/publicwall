@@ -319,15 +319,15 @@ function postComment(button) {
                 /* Looks like the post has failed! */
 
 
-                /* the two checks that are implemented are the locked post and blank      */
-                /* comment check.                                                         */
-                /* and that check is implemented on the users's side as well as the       */
-                /* on the server side. If the user is tampering around with the code      */
-                /* just fail silently. (that's what they get when they tamper with code)  */
+                /* the two checks that are implemented are the locked post and blank         */
+                /* comment check.                                                            */
+                /* and these checks are implemented on the users's side as well as the       */
+                /* on the server side. If the user is tampering around with the code         */
+                /* just fail silently. (that's what they get when they tamper with code)     */
 
 
             }
-            // The below is the same comment renderer used for other comments too!
+            // The below is the same comment renderer used for other comments too! //
             br = document.createElement("br")
             hr = document.createElement("hr")
 
@@ -348,7 +348,7 @@ function postComment(button) {
             commentdate = document.createElement("span");
             localized = commons.localizeTime(this.commentData["date"], window.tz);
             commentdatetext = document.createTextNode(localized.format(settings.DATE_FORMAT));
-            commentdate.setAttribute("id", "commentdate" + id);
+            commentdate.setAttribute("id", "commentdate" + data["id"]);
             commentdate.setAttribute("class", "grey float-right")
             commentdate.appendChild(commentdatetext)
 
@@ -356,7 +356,7 @@ function postComment(button) {
             // Author of comment
             commentauthor = document.createElement("span")
             commentauthornode = document.createTextNode(window.username);
-            commentauthor.setAttribute("id", "commentauthor" + id)
+            commentauthor.setAttribute("id", "commentauthor" + data["id"])
             commentauthor.setAttribute("class", "grey float-right")
             commentauthor.appendChild(commentauthornode);
 
@@ -368,8 +368,19 @@ function postComment(button) {
             commentBox.appendChild(hr);
 
             $("#commentBox" + this.commentData["postId"]);
+
+
+
         }
     });
+    /* Clear the comment box's value. */
+    /* This goes AFTER post-ing the   */
+    /* backend because if i reset it  */
+    /* the script would give blank    */
+    /* to the backend because it      */
+    /* reads the text box again when  */
+    /* post-ing the server.           */
+    $("#textInput" + postId).val("");
 
 
 

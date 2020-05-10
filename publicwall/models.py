@@ -23,7 +23,7 @@ def save_user_profile(sender, instance, **kwargs):
     instance.userextra.save()
 
 class Post(models.Model):
-  post_content = models.TextField(default=None)
+  content = models.TextField(default=None)
   date = models.DateTimeField(default=None)
   user = models.IntegerField(default=None)
   pinned = models.BooleanField(default=False)
@@ -39,7 +39,7 @@ class Post(models.Model):
 
 class Comment(models.Model):
   post = models.ForeignKey(Post, on_delete=models.CASCADE)
-  comment_content = models.TextField()
+  content = models.TextField()
   date = models.DateTimeField()
   user = models.IntegerField(null=True)
   def __str__(self):

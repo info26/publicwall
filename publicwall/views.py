@@ -6,7 +6,7 @@ from .models import *
 from django.contrib.auth import authenticate as auth_login
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.utils import timezone as tzz
+from django.utils import timezone
 from . import admin
 
 def index(request):
@@ -35,7 +35,7 @@ def index(request):
             for post in Post.objects.filter(pinned=True).order_by('-date'):
                 posts.append({
                     "date": post.date,
-                    "content": post.post_content,
+                    "content": post.content,
                     "user": User.objects.filter(pk=post.user)[0].username,
                     "pinned": post.pinned,
                     "locked": post.locked,
@@ -46,7 +46,7 @@ def index(request):
             for post in Post.objects.filter(pinned=False):
                 posts.append({
                     "date": post.date,
-                    "content": post.post_content,
+                    "content": post.content,
                     "user": User.objects.filter(pk=post.user)[0].username,
                     "pinned": post.pinned,
                     "locked": post.locked,
@@ -70,7 +70,7 @@ def index(request):
             comments = []
             for comment in refpost.comment_set.all():
                 comments.append({
-                    "content": comment.comment_content,
+                    "content": comment.content,
                     "date": comment.date,
                     "user": User.objects.filter(pk=comment.user)[0].username,
                     "id": comment.id
@@ -95,14 +95,20 @@ def index(request):
                     "ok": False,
                     "error": "Post cannot be blank"
                 })
-            if (Post.objects.get(pk = request.POST["postId"]).locked and 
+            elif (Post.objects.get(pk = request.POST["postId"]).locked and 
                 not request.user.has_perm("bypass-lock")):
                 # nope, it's locked! 
                 return JsonResponse({
                     "ok": False,
                     "error": "This post is locked! "
                 })
-            
+            # finally, let's add the comment.
+            Post.objects.get(pk = request.POST["postId"]).comment_set.create(
+                content = request.POST["text"],
+                date = timezone.now(),
+                user = request.user.id
+            )
+            return JsonResponse({"ok": True})
 
 
             # finally, let's add the post. 
@@ -110,7 +116,7 @@ def index(request):
         # Hey, if we're still running and the request is POST, the client
         # must have specified an action that is malformed. 
 
-        return JsonResponse({"error": "Malformed request. "})
+        return JsonResponse({"error": "Malformed request, your action attribute was: " + request.POST["action"]})
 
 
     # We will continue serving this page.

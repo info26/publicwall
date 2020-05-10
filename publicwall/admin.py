@@ -9,10 +9,10 @@ class CommentInline(admin.TabularInline):
   extra = 0
 class PostAdmin(admin.ModelAdmin):
   
-  list_display = ('post_content', 'date')
+  list_display = ('content', 'date')
   inlines = [CommentInline,]
   fieldsets = [
-    ("Post Info", {'fields':["post_content", "date"]}),
+    ("Post Info", {'fields':["content", "date"]}),
     ("Post Settings", {"fields":["user", "pinned", "locked"]})
   ]
 
