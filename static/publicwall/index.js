@@ -10,12 +10,50 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 */
 
+
+// this script is for index !!
+
 // Hey! Thanks for looking at my code! This is a 100% Javascript renderer for the public wall.
 // On the older version, the posts were rendered using Django templates, but now they are rendered
 // using this javascript renderer.
+/* https://developer.snapappointments.com/bootstrap-select/ */
+
+
+
+
+
+/* apply active class to 'home' tab. */
+$("#home-nav-item").addClass("active")
+/* Show logged in navbar */
+$("#nav-logged-in").show();
+
+
+function postPost() {
+    alert("Post content: " + $("#posttext").val());
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 $(function () {
+    var urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has("loggedin")) {
+        commons.notify({
+            type: NOTICE_TYPES.SUCCESS,
+            title: "You have logged in!",
+            delay: 5000,
+        });
+    }
     // Get posts from server.
     $.ajax({
         type: "POST",
@@ -32,8 +70,17 @@ $(function () {
             //
             posttextbox = document.createElement("textarea");
             posttextbox.setAttribute("class", "form-control");
-            posttextbox.setAttribute("placeholder", settings.POST_PLACEHOLDER)
+            posttextbox.setAttribute("placeholder", settings.POST_PLACEHOLDER);
+            posttextbox.setAttribute("id", "posttext");
             $("#content").append(posttextbox);
+
+            // button to submit text box content: 
+            postbutton = document.createElement("button");
+            postbuttontext = document.createTextNode(settings.POST_POST_BUTTON_TEXT);
+            postbutton.appendChild(postbuttontext);
+            postbutton.setAttribute("class", "btn btn-primary post-button");
+            postbutton.setAttribute("onclick", "postPost()");
+            $("#content").append(postbutton);
 
 
             for (post in data["posts"]) {
@@ -238,7 +285,7 @@ function continueInit() {
 
                     commentSubmitText = document.createTextNode(settings.CREATE_COMMENT_TEXT);
                     commentSubmit.appendChild(commentSubmitText);
-                    commentSubmit.setAttribute("class", "btn btn-primary");
+                    commentSubmit.setAttribute("class", "btn btn-primary comment-button");
                     commentSubmit.setAttribute("data-post-id", this.postid);
 
 
@@ -261,6 +308,7 @@ function continueInit() {
         }
 
     });
+    
 }
 
 function postComment(button) {
@@ -276,7 +324,6 @@ function postComment(button) {
     /* Text needed here to determine post validity */
     text = $("#textInput" + postId).val();
 
-    //TODO: Actually AJAX server!
     id = 0;
 
 

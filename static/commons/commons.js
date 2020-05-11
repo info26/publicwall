@@ -6,12 +6,15 @@ class NOTICE_TYPES {
 }
 
 class settings {
+    /* Date format */
     static DATE_FORMAT = "YYYYMMDD hh:mm:ssa";
+    /* Speed of animations */
     static TOGGLE_SPEED = 250;
     static COMMENT_PLACEHOLDER = "Post a new comment...";
     static POST_PLACEHOLDER = "Make a new post...";
     static CREATE_COMMENT_TEXT = "Submit";
     static POST_LOCKED_PLACEHOLDER = "This post is locked...";
+    static POST_POST_BUTTON_TEXT = "Submit";
 
     static POST_LOCKED_POPOVER_TITLE = "Post is locked";
     static POST_LOCKED_POPOVER_CONTENT = "Please contact an administrator to unlock this post. ";

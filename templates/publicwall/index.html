@@ -1,12 +1,17 @@
 {% extends 'base.html' %} {% block title %}Home Page{% endblock title%} {% block content %}
 {% csrf_token %}
 <link rel="stylesheet" href="/static/publicwall/index.css">
+<!-- -->
+<script>
+    window.PAGE_ID = "index"; 
+</script>
 <script src="/static/publicwall/index.js"></script>
 <div class="container">
     <div class="row">
         <div class="col">
             <div id="content">
                 {# content goes here #}
+
             </div>
         </div>
     </div>

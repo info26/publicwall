@@ -27,7 +27,7 @@ def index(request):
 
 
 
-        # this function returns posts, and the user's timezone. 
+        # this function returns posts, and the user's timezone. , and some user permissions. 
         if request.POST['action'] == "getinfo":
             # Client asking for posts.
             posts = []
@@ -57,6 +57,7 @@ def index(request):
                 "posts": posts,
                 "tz": request.user.userextra.timezone,
                 "username": request.user.username,
+                # "canOverrideLock": request.user.has_perm
             })
 
 
@@ -80,10 +81,9 @@ def index(request):
                 "locked": Post.objects.get(pk=request.POST['postid']).locked,
             })
 
-
-
-
-
+        # ---------------------------------
+        # WRITE FUNCTIONS 
+        # ---------------------------------
 
 
         # client asking to add a comment. 
@@ -93,7 +93,7 @@ def index(request):
             if request.POST["text"].strip() == "":
                 return JsonResponse({
                     "ok": False,
-                    "error": "Post cannot be blank"
+                    "error": "Comment cannot be blank"
                 })
             elif (Post.objects.get(pk = request.POST["postId"]).locked and 
                 not request.user.has_perm("bypass-lock")):
@@ -102,6 +102,13 @@ def index(request):
                     "ok": False,
                     "error": "This post is locked! "
                 })
+            elif not request.user.has_perm("publicwall.add-comment"):
+                # this user doesn't have permission
+                return JsonResponse({
+                    "ok": False,
+                    "error": "You have no permission! "
+                })
+            
             # finally, let's add the comment.
             Post.objects.get(pk = request.POST["postId"]).comment_set.create(
                 content = request.POST["text"],

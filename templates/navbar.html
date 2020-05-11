@@ -1,0 +1,61 @@
+<!-- navbar: -->
+
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <a class="navbar-brand" href="#">Navbar</a>
+    <!-- aria is not here.... too bad! -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+
+
+
+
+
+    <!-- The correct state of the navbar is shown when
+          javascript shows a proper div.              -->
+    <!-- This is probably the worst way to do it..... 
+         Too bad! -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div style="display:none;" id="nav-logged-in">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item" id="home-nav-item">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Profile Settings</a>
+                </li>
+            </ul>
+        </div>
+        <div style="display:none;" id="nav-logged-out">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item" id="login-nav-item">
+                <a class="nav-link" href="#">Login</a>
+            </li>
+        </ul>
+        </div>
+        <!-- hey.... the <ul> ends here!    !! -->
+
+        <!--
+
+
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Dropdown
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="#">Action</a>
+            <a class="dropdown-item" href="#">Another action</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Something else here</a>
+          </div>
+        </li>
+
+
+
+    -->
+
+    </div>
+</nav>
