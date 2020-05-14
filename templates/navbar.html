@@ -1,13 +1,21 @@
 <!-- navbar: -->
 
-
+<style>
+    /* Making links bold? Good or not? 
+    If it's bad... TOO BAD!           */
+    .nav-link-bold {
+        font-weight: bold;
+    }
+</style>
+<!-- nice blue themed navbar. -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <a class="navbar-brand" href="#">Navbar</a>
+  <!-- branding: :::: : :::-->
+    <a class="navbar-brand" href="#"><!-- Navbar --> <i class="far fa-newspaper"></i></a>
     <!-- aria is not here.... too bad! -->
     <button class="navbar-toggler" type="button" data-toggle="collapse">
       <span class="navbar-toggler-icon"></span>
     </button>
-
+    
 
 
 
@@ -16,24 +24,38 @@
     <!-- The correct state of the navbar is shown when
           javascript shows a proper div.              -->
     <!-- This is probably the worst way to do it..... 
-         Too bad! -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <div style="display:none;" id="nav-logged-in">
-            <ul class="navbar-nav mr-auto">
+         Too bad!                                     -->
+    <!-- do uncapitalized things look fancy?          -->
+    <!-- if it doesn't well.... too bad!              -->
+
+    <!-- Remember, keep .nav-link when applying       -->
+    <!-- .nav-link.bold                               -->
+    <div class="collapse navbar-collapse">
+        <!-- logged in navbar: -->
+        <div style="display: none!important /* override */; width: 100%; justify-content: space-between;" id="nav-logged-in" class="d-flex">
+            <ul class="navbar-nav justify-content-start d-flex">
                 <li class="nav-item" id="home-nav-item">
-                    <a class="nav-link" href="#">Home</a>
+                    <a class="nav-link nav-link-bold" href="#">home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Profile Settings</a>
+                    <a class="nav-link nav-link-bold" href="settings">profile settings</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav justify-content-end d-flex">
+                <li class="nav-item" id="logout-nav-item">
+                    <!-- might wanna reconsider hardcoding values?? -->
+                    <a class="nav-link nav-link-bold" href="/acc/logout">logout</a>
                 </li>
             </ul>
         </div>
+        <!-- logged out navbar: -->
         <div style="display:none;" id="nav-logged-out">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item" id="login-nav-item">
-                <a class="nav-link" href="#">Login</a>
-            </li>
-        </ul>
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item" id="login-nav-item">
+                    <!-- might wanna reconsider hardcoding values?? -->
+                    <a class="nav-link nav-link-bold" href="/acc/login">login</a>
+                </li>
+            </ul>
         </div>
         <!-- hey.... the <ul> ends here!    !! -->
 
@@ -55,7 +77,7 @@
 
 
 
-    -->
+        -->
 
     </div>
 </nav>

@@ -18,10 +18,15 @@
     <link rel="stylesheet" href="/static/pnotify/material.css">
     <!-- error handling: -->
     <script>
+        /* Error handling */
         window.onerror = function(e){
-            $("body").append('<p id="gone-wrong" style="padding: 5px;display: none;" class="bg-danger text-white"> Oh noes! Something has gone wrong! Please refresh the page, and if that doesn\'t work, please contact an administrator for more information. </p>')
+            if (!window.errorMsgShown) {
+                /* mark that the error msg has been shown */
+                window.errorMsgShown = true;
+                $("body").prepend('<p id="gone-wrong" style="" class="bg-danger text-white"> Oh noes! Something has gone wrong! Please refresh the page, and if that doesn\'t work, please contact an administrator for more information. </p>')
+            }
         };
-        
+
     </script>
     <script src="/static/moment/moment.js"></script>
     <script src="/static/moment/timezone.js"></script>
@@ -60,7 +65,6 @@
         Please refresh the page, and if that doesn't work, please contact an administrator for more information. 
     </p> -->
     {% block content %}{% endblock content %}
-    <!-- Pnotify spacing: -->
     
 
 </body>

@@ -1,3 +1,10 @@
+/* Url params */
+window.urlParams = new URLSearchParams(window.location.search);
+
+
+
+
+
 class NOTICE_TYPES {
     static NOTICE =  "notice";
     static INFO = "info";
@@ -15,6 +22,15 @@ class settings {
     static CREATE_COMMENT_TEXT = "Submit";
     static POST_LOCKED_PLACEHOLDER = "This post is locked...";
     static POST_POST_BUTTON_TEXT = "Submit";
+    static POST_DISABLED_PLACEHOLDER = "You are not allowed to post. ";
+
+    static NO_POSTS_ALERT_TEXT = "wow, such empty. ";
+
+    static CANT_POST_POPOVER_CONTENT = "Please contact an administrator to give you permissions to post. ";
+    static CANT_POST_POPOVER_TITLE = "You have no permission";
+
+    static CANT_COMMENT_TEXT = "No permission to comment";
+
 
     static POST_LOCKED_POPOVER_TITLE = "Post is locked";
     static POST_LOCKED_POPOVER_CONTENT = "Please contact an administrator to unlock this post. ";

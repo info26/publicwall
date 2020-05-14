@@ -11,8 +11,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 */
+
+// shows the navbar for logged out users. 
 $("#nav-logged-out").show();
-$("#login-nav-item").addClass("active")
+// marks the login nav item as active. 
+$("#login-nav-item").addClass("active");
 
 
 $("#login-form").submit(function() {

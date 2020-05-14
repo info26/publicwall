@@ -43,7 +43,7 @@ def index(request):
                     "id": post.id,
                 })
 
-            for post in Post.objects.filter(pinned=False):
+            for post in Post.objects.filter(pinned=False).order_by('-date'):
                 posts.append({
                     "date": post.date,
                     "content": post.content,
@@ -57,7 +57,12 @@ def index(request):
                 "posts": posts,
                 "tz": request.user.userextra.timezone,
                 "username": request.user.username,
-                # "canOverrideLock": request.user.has_perm
+                "permissionList": {
+                    "add-post": request.user.has_perm("publicwall.add-post"),
+                    "edit-post": request.user.has_perm("publicwall.edit-post"),
+                    "bypass-lock": request.user.has_perm("publicwall.bypass-lock"),
+                    "add-comment": False, #request.user.has_perm("publicwall.add-comment"),
+                }
             })
 
 
@@ -84,7 +89,28 @@ def index(request):
         # ---------------------------------
         # WRITE FUNCTIONS 
         # ---------------------------------
-
+        if request.POST["action"] == 'addpost':
+            if request.POST["content"].strip() == "":
+                return JsonResponse({
+                    "ok": False,
+                    "error": "Post cannot be blank"
+                })
+            elif not request.user.has_perm("publicwall.add-post"):
+                return JsonResponse({
+                    "ok": False,
+                    "error": "no permission"
+                })
+            newPost = Post.objects.create(
+                content = request.POST["content"],
+                user = request.user.id,
+                date = timezone.now(),
+                pinned = False,
+                locked = False
+            )
+            return JsonResponse({
+                "id": newPost.id,
+                "date": newPost.date
+            })
 
         # client asking to add a comment. 
         if request.POST["action"] == "addcomment":
@@ -96,7 +122,7 @@ def index(request):
                     "error": "Comment cannot be blank"
                 })
             elif (Post.objects.get(pk = request.POST["postId"]).locked and 
-                not request.user.has_perm("bypass-lock")):
+                not request.user.has_perm("publicwall.bypass-lock")):
                 # nope, it's locked! 
                 return JsonResponse({
                     "ok": False,
@@ -126,8 +152,6 @@ def index(request):
         return JsonResponse({"error": "Malformed request, your action attribute was: " + request.POST["action"]})
 
 
-    # We will continue serving this page.
-    # TODO: Make home page which shows the current posts.
     return render(request,
     'publicwall/index.html',
     {

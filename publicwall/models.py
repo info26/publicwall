@@ -29,7 +29,7 @@ class Post(models.Model):
   pinned = models.BooleanField(default=False)
   locked = models.BooleanField(default=False)
   def __str__(self):
-    return self.post_content
+    return self.content
   class Meta:
     permissions = [
       ("add-post", "Ability to add a post. "), 
@@ -43,7 +43,7 @@ class Comment(models.Model):
   date = models.DateTimeField()
   user = models.IntegerField(null=True)
   def __str__(self):
-    return self.comment_content
+    return self.content
   class Meta:
     permissions = [
       ("add-comment", "Ability to make a comment."),

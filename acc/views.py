@@ -22,4 +22,13 @@ def login(request):
         return JsonResponse({"correct": True})
         
     
+def logout(request):
+    success = True
+    if not request.user.is_authenticated:
+        success = False
+    intlogout(request)
+    
+    return render(request, 'acc/logout.html', {
+        "success": success
+    })
 

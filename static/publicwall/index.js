@@ -27,9 +27,216 @@ $("#home-nav-item").addClass("active")
 /* Show logged in navbar */
 $("#nav-logged-in").show();
 
+function render() {
+    $.ajax({
+        type: "POST",
+        url: "",
+        data: {
+            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+            action: "getinfo"
+        },
+        success: function (data) {
+            $("#content").empty();
+            // write user's tz
+            window.tz = data["tz"];
+            window.username = data["username"];
+            // write user perms 
+            window.userPermissions = data["permissionList"];
+            // text box to post things.
+            //
+            posttextbox = document.createElement("textarea");
+            posttextbox.setAttribute("class", "form-control");
+            if (!window.userPermissions["add-post"]) {
+                // wait, this user doesn't have permission to add a post !!!!! //
+                posttextbox.setAttribute("disabled", true);
+                posttextbox.setAttribute("placeholder", settings.POST_DISABLED_PLACEHOLDER);
+            } else {
+                posttextbox.setAttribute("placeholder", settings.POST_PLACEHOLDER);
+            }
+            posttextbox.setAttribute("id", "posttext");
+            $("#content").append(posttextbox);
 
+
+
+
+            // locking / pinning:
+            // locking:
+            if (window.userPermissions["edit-post"]) {
+
+                postControlBox = document.createElement("div");
+                postControlBox.setAttribute("class", "form-inline");
+
+                /* group1 = document.createElement("div"); */
+
+                lockPost = genCheckbox({
+                    id: "lockPostCheckbox",
+                    text: "Locked?"
+                });
+                /* Slight spacing */
+                lockPost.classList.add("mr-1");
+                postControlBox.appendChild(lockPost);
+
+                pinPost = genCheckbox({
+                    id: "pinPostCheckbox",
+                    text: "Pinned?"
+                })
+
+
+                postControlBox.appendChild(pinPost);
+
+                $("#content").append(postControlBox);
+
+            }
+
+
+
+
+
+
+            // button to submit text box content: 
+            postbutton = document.createElement("button");
+            postbuttontext = document.createTextNode(settings.POST_POST_BUTTON_TEXT);
+            postbutton.appendChild(postbuttontext);
+            postbutton.setAttribute("class", "btn btn-primary post-button");
+            if (!window.userPermissions["add-post"]) {
+                postbutton.setAttribute("data-toggle", "popover");
+                postbutton.setAttribute("data-content", settings.CANT_POST_POPOVER_CONTENT);
+                postbutton.setAttribute("tabindex", 0);
+                postbutton.setAttribute("data-trigger", "focus");
+            } else {
+                postbutton.setAttribute("onclick", "postPost()");
+            }
+            $("#content").append(postbutton);
+
+
+
+
+
+
+
+
+            // initing the post button popover: if no permission to post: 
+            // for some reason, these need to be done AFTEr the element 
+            // is appended the the dom tree. 
+            if (!window.userPermissions["add-post"]) {
+                $(postbutton).popover();
+                postbutton.setAttribute("title", settings.CANT_POST_POPOVER_TITLE);
+            }
+
+
+            for (post in data["posts"]) {
+
+
+
+                postele = genPostElement(data["posts"][post]);
+                // Appends the prepared element into the DOM tree.
+                $("#posts").append(postele);
+
+
+
+            }
+
+
+            
+
+
+
+
+
+
+
+
+            if (data["posts"].length == 0) {
+                br = document.createElement("br");
+                br2 = document.createElement("br");
+                noPostsAlert = document.createElement("div");
+                noPostsAlert.setAttribute("class", "alert alert-primary");
+                noPostsAlertText = document.createTextNode(settings.NO_POSTS_ALERT_TEXT);
+                noPostsAlert.appendChild(noPostsAlertText);
+                $("#content").append(br);
+                $("#content").append(br2);
+                $("#content").append(noPostsAlert);
+            }
+            //Call to continue initialization.
+            registerCommentHook('.showcomments');
+        },
+    });
+}
 function postPost() {
+    /*
     alert("Post content: " + $("#posttext").val());
+    */
+    if ($("#posttext").val() == "") {
+        commons.notify({
+            type: NOTICE_TYPES.ERROR,
+            msg: "Your post cannot be blank! ",
+            delay: 5000,
+            title: "Uh oh!"
+        })
+    }
+
+
+
+    $.ajax({
+        type: 'POST',
+        url: '',
+        data: {
+            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+            action: "addpost",
+            content: $("#posttext").val()
+        },
+        postdata: {
+            content: $("#posttext").val(),
+        },
+        success: function (data) {
+            gennedPost = genPostElement({
+                id: data["id"],
+                content: this.postdata["content"],
+                /* TODO: Change this VVV*/
+                pinned: false,
+                author: window.username,
+                date: data["date"],
+                /* Assume this post has 0 comments*/
+                comments: 0,
+            })
+
+            /* Using pure DOM because jquery
+            seems to glitch out when querying children
+            and looping over the list. */
+            renderedPosts = $("#posts")[0].children;
+            firstNotPinned = null; 
+        
+            /* TODO: Plop post at top, if it is pinned */
+            for (post = 0; post < renderedPosts.length; post++) {
+                /*if (typeof $(renderedPosts[post]).attr("pinned") == "undefined") {
+                    continue;
+                }*/
+                console.log($(renderedPosts[post]).attr("pinned"));
+                if ($(renderedPosts[post]).attr("pinned") == "false") {
+                    /* We found the first post that isn't pinned. YAY! */
+                    firstNotPinned = renderedPosts[post];
+                    break;
+                }
+            }
+            if (firstNotPinned == null) {
+                /* All the posts are pinned.... */
+                /* so just plop it at the top   */
+                $("#posts").prepend(gennedPost);
+            }
+            $(gennedPost).insertBefore(firstNotPinned);
+
+
+            /* There is probably a better way to do this.... 
+            TOO BAD!                                        */
+            registerCommentHook($(gennedPost).children(".showcomments"));
+            
+        }
+    });
+    /* render(); */
+
+
+
+
 }
 
 
@@ -46,145 +253,19 @@ function postPost() {
 
 
 $(function () {
-    var urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has("loggedin")) {
+
+    if (window.urlParams.has("loggedin")) {
         commons.notify({
             type: NOTICE_TYPES.SUCCESS,
             title: "You have logged in!",
             delay: 5000,
         });
     }
-    // Get posts from server.
-    $.ajax({
-        type: "POST",
-        url: "",
-        data: {
-            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
-            action: "getinfo"
-        },
-        success: function (data) {
-            // write user's tz
-            window.tz = data["tz"];
-            window.username = data["username"];
-            // text box to post things.
-            //
-            posttextbox = document.createElement("textarea");
-            posttextbox.setAttribute("class", "form-control");
-            posttextbox.setAttribute("placeholder", settings.POST_PLACEHOLDER);
-            posttextbox.setAttribute("id", "posttext");
-            $("#content").append(posttextbox);
-
-            // button to submit text box content: 
-            postbutton = document.createElement("button");
-            postbuttontext = document.createTextNode(settings.POST_POST_BUTTON_TEXT);
-            postbutton.appendChild(postbuttontext);
-            postbutton.setAttribute("class", "btn btn-primary post-button");
-            postbutton.setAttribute("onclick", "postPost()");
-            $("#content").append(postbutton);
-
-
-            for (post in data["posts"]) {
-                br = document.createElement("br")
-                // floating a br right causes problems
-                // in firefox. 
-                br.setAttribute("class", "grey")
-                hr = document.createElement("hr")
-
-                // Main post element
-                // -----------------
-                postele = document.createElement("div")
-                // -----------------
-
-
-                // The content of the post:
-                // ------------------------
-                posttext = document.createElement("span")
-                posttexttext = document.createTextNode(data["posts"][post]["content"]);
-                posttext.appendChild(posttexttext);
-                posttext.setAttribute("id", "posttext" + data["posts"][post]["id"])
-
-
-
-
-                // The date of the post
-                // --------------------
-                postdate = document.createElement("span");
-                localized = commons.localizeTime(data["posts"][post]["date"], window.tz);
-                postdatetext = document.createTextNode(localized.format(settings.DATE_FORMAT))
-                postdate.appendChild(postdatetext)
-                postdate.setAttribute("id", "postdate" + data["posts"][post]["id"])
-                postdate.setAttribute("class", "grey float-right")
-
-
-
-                // The author of the post
-                // ----------------------
-                postauthor = document.createElement("span");
-                postauthortext = document.createTextNode(data["posts"][post]["user"])
-                postauthor.setAttribute("class", "grey float-right")
-                postauthor.appendChild(postauthortext);
-                postauthor.setAttribute("id", "postauthor" + data["posts"][post]["id"])
-
-
-                // The link for the comment. <a>Comments [1]</a>
-                // ---------------------------------------------
-                postcommentlink = document.createElement("a")
-                postcommenttext = document.createTextNode("Comments[" + data["posts"][post]["comments"] + "]")
-                postcommentlink.appendChild(postcommenttext);
-                postcommentlink.setAttribute("id", "postcomment" + data["posts"][post]["id"])
-                postcommentlink.setAttribute("class", "link showcomments")
-                postcommentlink.setAttribute("data-id", data["posts"][post]["id"])
-
-
-                // div for everything under post.
-                postunderdiv = document.createElement("div");
-                postunderdiv.setAttribute("id", "postUnder" + data["posts"][post]["id"]);
-                postunderdiv.setAttribute("class", "postUnder");
-                postunderdiv.style.height = "0%";
-                postunderdiv.style.display = "none";
-
-
-
-
-                // Div for the comment box
-                postcommentdiv = document.createElement("div")
-                postcommentdiv.setAttribute("data-id", data["posts"][post]["id"]);
-                postcommentdiv.setAttribute("loaded", false);
-                postcommentdiv.setAttribute("id", "commentbox" + data["posts"][post]["id"])
-                postcommentdiv.setAttribute("class", "commentbox");
-
-                //Div for comment controls box. eg. textbox for form and button
-                // to add comment.
-                // Div for the comment box
-                postcontrolsdiv = document.createElement("div")
-                postcontrolsdiv.setAttribute("id", "controlsbox" + data["posts"][post]["id"])
-
-
-                postunderdiv.appendChild(postcommentdiv);
-                postunderdiv.appendChild(postcontrolsdiv);
-
-                // Appends everything
-                postele.appendChild(posttext);
-                postele.appendChild(postdate);
-                postele.appendChild(br);
-                postele.appendChild(postauthor);
-                postele.appendChild(postcommentlink);
-                // postele.appendChild(postcommentdiv);
-                // postele.appendChild(postcontrolsdiv);
-                postele.appendChild(postunderdiv);
-                postele.appendChild(hr);
-
-                // Appends the prepared element into the DOM tree.
-                $("#content").append(postele);
-            }
-            //Call to continue initialization.
-            continueInit();
-        },
-    });
+    render();
 });
-function continueInit() {
+function registerCommentHook(selector) {
     // register hook for when a link to show comments is clicked.
-    $(".showcomments").click(function () {
+    $(selector).click(function () {
         // TODO: Clean this up!
         commentBox = $("#postUnder" + $(this).attr("data-id"));
         if (commentBox.attr("loaded") == "true") {
@@ -212,87 +293,70 @@ function continueInit() {
                 },
                 success: function (data) {
                     for (comment in data["comments"]) {
-                        br = document.createElement("br")
-                        hr = document.createElement("hr")
 
 
 
-                        commentBox = $("#commentbox" + this.postid)[0];
+                        commentElement = genComment(data["comments"][comment]);
 
-
-                        // Text of comment
-                        // ---------------
-                        commenttext = document.createElement("span")
-                        commenttextnode = document.createTextNode(data["comments"][comment]["content"]);
-                        commenttext.setAttribute("id", "commenttext" + data["comments"][comment]["id"])
-                        commenttext.appendChild(commenttextnode);
+                        $("#commentbox" + this.postid)[0].append(commentElement);
 
 
 
-                        // Date of comment
-                        commentdate = document.createElement("span");
-                        localized = commons.localizeTime(data["comments"][comment]["date"], window.tz);
-                        commentdatetext = document.createTextNode(localized.format(settings.DATE_FORMAT));
-                        commentdate.setAttribute("id", "commentdate" + data["comments"][comment]["id"]);
-                        commentdate.setAttribute("class", "grey float-right")
-                        commentdate.appendChild(commentdatetext)
 
-
-                        // Author of comment
-                        commentauthor = document.createElement("span")
-                        commentauthornode = document.createTextNode(data["comments"][comment]["user"]);
-                        commentauthor.setAttribute("id", "commentauthor" + data["comments"][comment]["id"])
-                        commentauthor.setAttribute("class", "grey float-right")
-                        commentauthor.appendChild(commentauthornode);
-
-                        // append everything
-                        commentBox.appendChild(commenttext);
-                        commentBox.appendChild(commentdate);
-                        commentBox.appendChild(br);
-                        commentBox.appendChild(commentauthor);
-                        commentBox.appendChild(hr);
-                    }
-                    // Create textbox for adding comment
-                    commentInputBox = document.createElement("textarea");
-                    // set style
-                    commentInputBox.setAttribute("class", "form-control");
-                    commentInputBox.setAttribute("id", "textInput" + this.postid);
-                    if (data["locked"]) {
-                        commentInputBox.setAttribute("disabled", true);
-                        commentInputBox.setAttribute("placeholder", settings.POST_LOCKED_PLACEHOLDER);
-                    } else if (!data["locked"]) {
-                        commentInputBox.setAttribute("placeholder", settings.COMMENT_PLACEHOLDER);
                     }
 
 
-                    // create button for adding post
-                    commentSubmit = document.createElement("button");
+                    if (window.userPermissions["add-comment"]) {
+                        // Create textbox for adding comment
+                        commentInputBox = document.createElement("textarea");
+                        // set style
+                        commentInputBox.setAttribute("class", "form-control");
+                        commentInputBox.setAttribute("id", "textInput" + this.postid);
+                        if (data["locked"]) {
+                            commentInputBox.setAttribute("disabled", true);
+                            commentInputBox.setAttribute("placeholder", settings.POST_LOCKED_PLACEHOLDER);
+                        } else if (!data["locked"]) {
+                            commentInputBox.setAttribute("placeholder", settings.COMMENT_PLACEHOLDER);
+                        }
 
-                    if (data["locked"]) {
-                        // commentSubmit.setAttribute("disabled", true);
 
-                        // init popover.
-                        commentSubmit.setAttribute("data-toggle", "popover");
-                        // commentSubmit.setAttribute("title", settings.POST_LOCKED_POPOVER_TITLE);
-                        commentSubmit.setAttribute("data-content", settings.POST_LOCKED_POPOVER_CONTENT);
-                        commentSubmit.setAttribute("tabindex", 0);
-                        commentSubmit.setAttribute("data-trigger", "focus");
+                        // create button for adding post
+                        commentSubmit = document.createElement("button");
 
-                    } else if (!data["locked"]) {
-                        // only register click event if the post is not locked.
-                        commentSubmit.setAttribute("onclick", "postComment(this)");
+                        if (data["locked"]) {
+                            // commentSubmit.setAttribute("disabled", true);
+
+                            // init popover.
+                            commentSubmit.setAttribute("data-toggle", "popover");
+                            // commentSubmit.setAttribute("title", settings.POST_LOCKED_POPOVER_TITLE);
+                            commentSubmit.setAttribute("data-content", settings.POST_LOCKED_POPOVER_CONTENT);
+                            commentSubmit.setAttribute("tabindex", 0);
+                            commentSubmit.setAttribute("data-trigger", "focus");
+
+                        } else if (!data["locked"]) {
+                            // only register click event if the post is not locked.
+                            commentSubmit.setAttribute("onclick", "postComment(this)");
+                        }
+
+                        commentSubmitText = document.createTextNode(settings.CREATE_COMMENT_TEXT);
+                        commentSubmit.appendChild(commentSubmitText);
+                        commentSubmit.setAttribute("class", "btn btn-primary comment-button");
+                        commentSubmit.setAttribute("data-post-id", this.postid);
+
+
+
+
+                        $("#controlsbox" + this.postid)[0].appendChild(commentInputBox);
+                        $("#controlsbox" + this.postid)[0].appendChild(commentSubmit);
+
+                    } else {
+                        noPermission = document.createElement("i");
+                        noPermissionText = document.createTextNode(settings.CANT_COMMENT_TEXT);
+                        noPermission.appendChild(noPermissionText);
+                        noPermission.setAttribute("class", "text-muted");
+
+                        $("#controlsbox" + this.postid)[0].appendChild(noPermission);
                     }
-
-                    commentSubmitText = document.createTextNode(settings.CREATE_COMMENT_TEXT);
-                    commentSubmit.appendChild(commentSubmitText);
-                    commentSubmit.setAttribute("class", "btn btn-primary comment-button");
-                    commentSubmit.setAttribute("data-post-id", this.postid);
-
-
-
-
-                    $("#controlsbox" + this.postid)[0].appendChild(commentInputBox);
-                    $("#controlsbox" + this.postid)[0].appendChild(commentSubmit);
 
 
                     $("#postUnder" + this.postid).slideDown(settings.TOGGLE_SPEED);
@@ -301,14 +365,16 @@ function continueInit() {
 
 
                     // These need to be done AFTER the element is appended to the div.
-                    $(commentSubmit).popover();
-                    commentSubmit.setAttribute("title", settings.POST_LOCKED_POPOVER_TITLE);
+                    if (data["locked"] && window.userPermissions["add-comment"]) {
+                        $(commentSubmit).popover();
+                        commentSubmit.setAttribute("title", settings.POST_LOCKED_POPOVER_TITLE);
+                    }
                 }
             });
         }
 
     });
-    
+
 }
 
 function postComment(button) {
@@ -337,7 +403,6 @@ function postComment(button) {
         // stop processing this request.
         return;
     }
-
 
     /* Start actually processing this request */
     $.ajax({
@@ -375,46 +440,23 @@ function postComment(button) {
 
             }
             // The below is the same comment renderer used for other comments too! //
-            br = document.createElement("br")
-            hr = document.createElement("hr")
-
 
             commentBox = $("#commentbox" + this.commentData["postId"])[0];
 
 
-            // Text of comment
-            // ---------------
-            commenttext = document.createElement("span")
-            commenttextnode = document.createTextNode(this.commentData["text"]);
-            commenttext.setAttribute("id", "commenttext" + id)
-            commenttext.appendChild(commenttextnode);
 
 
 
-            // Date of comment
-            commentdate = document.createElement("span");
-            localized = commons.localizeTime(this.commentData["date"], window.tz);
-            commentdatetext = document.createTextNode(localized.format(settings.DATE_FORMAT));
-            commentdate.setAttribute("id", "commentdate" + data["id"]);
-            commentdate.setAttribute("class", "grey float-right")
-            commentdate.appendChild(commentdatetext)
 
 
-            // Author of comment
-            commentauthor = document.createElement("span")
-            commentauthornode = document.createTextNode(window.username);
-            commentauthor.setAttribute("id", "commentauthor" + data["id"])
-            commentauthor.setAttribute("class", "grey float-right")
-            commentauthor.appendChild(commentauthornode);
 
-            // append everything
-            commentBox.appendChild(commenttext);
-            commentBox.appendChild(commentdate);
-            commentBox.appendChild(br);
-            commentBox.appendChild(commentauthor);
-            commentBox.appendChild(hr);
+            commentBox.appendChild(genComment({
+                id: data["id"],
+                content: this.commentData["text"],
+                date: this.commentData["date"],
+                user: window.username,
+            }))
 
-            $("#commentBox" + this.commentData["postId"]);
 
 
 
@@ -428,6 +470,7 @@ function postComment(button) {
     /* reads the text box again when  */
     /* post-ing the server.           */
     $("#textInput" + postId).val("");
+
 
 
 
