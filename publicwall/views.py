@@ -8,15 +8,28 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.utils import timezone
 from . import admin
+import pytz
+from django.core.paginator import Paginator
 
 def index(request):
     # this should be at the tippy top. 
     # First, we check if the user is logged in or not.
     # If not, we won't display the index page.
     # We will redirect user to login page instead.
+
+    # 
+
+
+
+
     if not request.user.is_authenticated:
         # Redirect this user:
         return redirect('/acc/login')
+
+
+    # Check to make sure user has set a valid timezone
+    if not request.user.userextra.timezone in pytz.common_timezones:
+        return redirect('/user/request-timezone/')
 
     
     if request.method == "POST":
@@ -33,25 +46,34 @@ def index(request):
             posts = []
             # Get pinned posts that and order them by date.
             for post in Post.objects.filter(pinned=True).order_by('-date'):
+                author = User.objects.filter(pk=post.user)[0]
                 posts.append({
                     "date": post.date,
                     "content": post.content,
-                    "user": User.objects.filter(pk=post.user)[0].username,
+                    "user": author.username,
                     "pinned": post.pinned,
                     "locked": post.locked,
                     'comments': len(post.comment_set.all()),
                     "id": post.id,
+                    "authorid": author.id 
                 })
+            # gonna try out a paginator!
+            p = Paginator(Post.objects.filter(pinned=False).order_by('-date'), 10)
+            # set up!
+            # We are only going to send the first page, and let the client
+            # request more. 
 
-            for post in Post.objects.filter(pinned=False).order_by('-date'):
+            for post in p.page(1):
+                author = User.objects.filter(pk=post.user)[0]
                 posts.append({
                     "date": post.date,
                     "content": post.content,
-                    "user": User.objects.filter(pk=post.user)[0].username,
+                    "user": author.username,
                     "pinned": post.pinned,
                     "locked": post.locked,
                     'comments': len(post.comment_set.all()),
                     "id": post.id,
+                    "authorid": author.id 
                 })
             return JsonResponse({
                 "posts": posts,
@@ -59,10 +81,11 @@ def index(request):
                 "username": request.user.username,
                 "permissionList": {
                     "add-post": request.user.has_perm("publicwall.add-post"),
-                    "edit-post": request.user.has_perm("publicwall.edit-post"),
+                    "admin": request.user.has_perm("publicwall.admin"),
                     "bypass-lock": request.user.has_perm("publicwall.bypass-lock"),
-                    "add-comment": False, #request.user.has_perm("publicwall.add-comment"),
-                }
+                    "add-comment": request.user.has_perm("publicwall.add-comment"),
+                },
+                "userid": request.user.id,
             })
 
 
@@ -73,13 +96,16 @@ def index(request):
         # the client has supplied. 
         if request.POST['action'] == "getcomments":
             refpost = Post.objects.get(pk=request.POST['postid'])
+            
             comments = []
             for comment in refpost.comment_set.all():
+                author = User.objects.filter(pk=comment.user)[0]
                 comments.append({
                     "content": comment.content,
                     "date": comment.date,
-                    "user": User.objects.filter(pk=comment.user)[0].username,
-                    "id": comment.id
+                    "user": author.username,
+                    "id": comment.id,
+                    "authorid": author.id
                 })
             return JsonResponse({
                 "comments": comments,
@@ -136,12 +162,34 @@ def index(request):
                 })
             
             # finally, let's add the comment.
-            Post.objects.get(pk = request.POST["postId"]).comment_set.create(
+            addedComment = Post.objects.get(pk = request.POST["postId"]).comment_set.create(
                 content = request.POST["text"],
                 date = timezone.now(),
                 user = request.user.id
             )
-            return JsonResponse({"ok": True})
+            return JsonResponse({
+                "ok": True,
+                "date": addedComment.date,
+                "id": addedComment.id,
+            })
+        if request.POST["action"] == "getmoreposts":
+            # create paginator #
+            p = Paginator(Post.objects.filter(pinned=False).order_by('-date'), 10)
+            posts = []
+            for post in p.page(request.POST["page"]):
+                posts.append({
+                    "date": post.date,
+                    "content": post.content,
+                    "user": User.objects.filter(pk=post.user)[0].username,
+                    "pinned": post.pinned,
+                    "locked": post.locked,
+                    'comments': len(post.comment_set.all()),
+                    "id": post.id,
+                })
+            return JsonResponse({
+                "posts": posts,
+                "more": p.page(request.POST["page"]).has_next(),
+            })
 
 
             # finally, let's add the post. 

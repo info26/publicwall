@@ -34,7 +34,7 @@ class Post(models.Model):
     permissions = [
       ("add-post", "Ability to add a post. "), 
       ("bypass-time-restriction", "can bypass time restriction"), 
-      ("edit-post", "Can use editing post modal. ")
+      ("admin", "Can use sudo interface. ")
     ]
 
 class Comment(models.Model):

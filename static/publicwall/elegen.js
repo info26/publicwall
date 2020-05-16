@@ -38,24 +38,26 @@ function genPostElement(specs) {
     posttexttext = document.createTextNode(specs["content"]);
     posttext.appendChild(posttexttext);
     posttext.setAttribute("id", "posttext" + specs["id"])
-
+    posttext.setAttribute("style", "word-wrap: break-word; overflow: hidden;")
 
 
 
     // The date of the post
     // --------------------
     postdate = document.createElement("span");
+
     localized = commons.localizeTime(specs["date"], window.tz);
     postdatetext = document.createTextNode(localized.format(settings.DATE_FORMAT))
     postdate.appendChild(postdatetext)
     postdate.setAttribute("id", "postdate" + specs["id"])
-    postdate.setAttribute("class", "grey float-right")
+    postdate.setAttribute("class", "float-right")
 
 
 
     // The author of the post
     // ----------------------
     postauthor = document.createElement("span");
+    postauthor.setAttribute("onclick", "showProfile(" + specs["authorid"] + ")");
     postauthortext = document.createTextNode(specs["user"])
     postauthor.setAttribute("class", "grey float-right")
     postauthor.appendChild(postauthortext);
@@ -144,10 +146,12 @@ function genComment(specs) {
 
 
     // Author of comment
-    commentauthor = document.createElement("span")
+    commentauthor = document.createElement("span");
     commentauthornode = document.createTextNode(specs["user"]);
-    commentauthor.setAttribute("id", "commentauthor" + specs["id"])
-    commentauthor.setAttribute("class", "grey float-right")
+    commentauthor.setAttribute("id", "commentauthor" + specs["id"]);
+    commentauthor.setAttribute("class", "grey float-right");
+    console.log(specs);
+    commentauthor.setAttribute("onclick", "showProfile(" + specs["authorid"] + ")");
     commentauthor.appendChild(commentauthornode);
 
     // append everything

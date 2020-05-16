@@ -20,7 +20,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 
-
+/* server gives page1 first, so set window.pageRendered to 1 */
+window.pageRendered = 1;
 
 /* apply active class to 'home' tab. */
 $("#home-nav-item").addClass("active")
@@ -40,6 +41,7 @@ function render() {
             // write user's tz
             window.tz = data["tz"];
             window.username = data["username"];
+            window.userid = data["userid"];
             // write user perms 
             window.userPermissions = data["permissionList"];
             // text box to post things.
@@ -73,7 +75,7 @@ function render() {
                     text: "Locked?"
                 });
                 /* Slight spacing */
-                lockPost.classList.add("mr-1");
+                lockPost.classList.add("mr-2");
                 postControlBox.appendChild(lockPost);
 
                 pinPost = genCheckbox({
@@ -153,6 +155,7 @@ function render() {
                 noPostsAlert.setAttribute("class", "alert alert-primary");
                 noPostsAlertText = document.createTextNode(settings.NO_POSTS_ALERT_TEXT);
                 noPostsAlert.appendChild(noPostsAlertText);
+                noPostsAlert.setAttribute("id", "no-posts-alert");
                 $("#content").append(br);
                 $("#content").append(br2);
                 $("#content").append(noPostsAlert);
@@ -174,7 +177,8 @@ function postPost() {
             title: "Uh oh!"
         })
     }
-
+    /* Clear empty posts alert. */
+    $("no-posts-alert").hide();
 
 
     $.ajax({
@@ -194,10 +198,11 @@ function postPost() {
                 content: this.postdata["content"],
                 /* TODO: Change this VVV*/
                 pinned: false,
-                author: window.username,
+                user: window.username,
                 date: data["date"],
                 /* Assume this post has 0 comments*/
                 comments: 0,
+                
             })
 
             /* Using pure DOM because jquery
@@ -211,7 +216,7 @@ function postPost() {
                 /*if (typeof $(renderedPosts[post]).attr("pinned") == "undefined") {
                     continue;
                 }*/
-                console.log($(renderedPosts[post]).attr("pinned"));
+                // console.log($(renderedPosts[post]).attr("pinned"));
                 if ($(renderedPosts[post]).attr("pinned") == "false") {
                     /* We found the first post that isn't pinned. YAY! */
                     firstNotPinned = renderedPosts[post];
@@ -294,14 +299,9 @@ function registerCommentHook(selector) {
                 success: function (data) {
                     for (comment in data["comments"]) {
 
-
-
                         commentElement = genComment(data["comments"][comment]);
 
                         $("#commentbox" + this.postid)[0].append(commentElement);
-
-
-
 
                     }
 
@@ -453,8 +453,9 @@ function postComment(button) {
             commentBox.appendChild(genComment({
                 id: data["id"],
                 content: this.commentData["text"],
-                date: this.commentData["date"],
+                date: data["date"],
                 user: window.username,
+                authorid: window.userid,
             }))
 
 
@@ -472,9 +473,43 @@ function postComment(button) {
     $("#textInput" + postId).val("");
 
 
-
-
-
-
-
 }
+
+
+
+
+/* Auto load more posts! */
+
+$(window).scroll(function() {
+    if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
+        if (window.pageRendered == -1) {
+            return;
+        }
+        window.pageRendered++;
+        $.ajax({
+            type: 'POST',
+            url: '',
+            data: {
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                action: "getmoreposts",
+                page: window.pageRendered,
+            },
+            success: function(data) {
+                if (data["more"] == false) {
+                    // no more pages. 
+                    window.pageRendered = -1;
+                }
+                for (post in data["posts"]) {
+
+                    postele = genPostElement(data["posts"][post]);
+                    // Appends the prepared element into the DOM tree.
+                    $("#posts").append(postele);
+                    /* Register comments hook */
+                    registerCommentHook($(postele).children(".showcomments"));
+
+    
+                }
+            }
+        });
+    }
+})

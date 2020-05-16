@@ -11,4 +11,5 @@ urlpatterns = [
     path('', views.index),
     # Bind urls for authentication:
     path('acc/', include('acc.urls')),
+    path('user/', include('user.urls')),
 ]
