@@ -21,13 +21,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 /* server gives page1 first, so set window.pageRendered to 1 */
-window.pageRendered = 1;
+/* window.pageRendered = 1; */
 
 /* apply active class to 'home' tab. */
 $("#home-nav-item").addClass("active")
 /* Show logged in navbar */
 $("#nav-logged-in").show();
 
+
+
+
+/* 
+ * render()
+ * Function is called when page loads, to render what
+ * the user initially sees. 
+ */
 function render() {
     $.ajax({
         type: "POST",
@@ -44,6 +52,17 @@ function render() {
             window.userid = data["userid"];
             // write user perms 
             window.userPermissions = data["permissionList"];
+
+            // console.log(data);
+
+
+            if (data["pages"] == 1) {
+                // No more pages!
+                window.pageRendered = -1;
+            } else {
+                // there are more pages! 
+                window.pageRendered = 1;
+            }
             // text box to post things.
             //
             posttextbox = document.createElement("textarea");
@@ -63,7 +82,7 @@ function render() {
 
             // locking / pinning:
             // locking:
-            if (window.userPermissions["edit-post"]) {
+            if (window.userPermissions["add-post"]) {
 
                 postControlBox = document.createElement("div");
                 postControlBox.setAttribute("class", "form-inline");
@@ -92,9 +111,6 @@ function render() {
 
 
 
-
-
-
             // button to submit text box content: 
             postbutton = document.createElement("button");
             postbuttontext = document.createTextNode(settings.POST_POST_BUTTON_TEXT);
@@ -109,12 +125,6 @@ function render() {
                 postbutton.setAttribute("onclick", "postPost()");
             }
             $("#content").append(postbutton);
-
-
-
-
-
-
 
 
             // initing the post button popover: if no permission to post: 
@@ -138,16 +148,6 @@ function render() {
 
             }
 
-
-            
-
-
-
-
-
-
-
-
             if (data["posts"].length == 0) {
                 br = document.createElement("br");
                 br2 = document.createElement("br");
@@ -165,6 +165,11 @@ function render() {
         },
     });
 }
+/* 
+ * postPost()
+ * Function is called when user attempts to make a new post, 
+ * using the "Submit" button
+ */
 function postPost() {
     /*
     alert("Post content: " + $("#posttext").val());
@@ -175,7 +180,9 @@ function postPost() {
             msg: "Your post cannot be blank! ",
             delay: 5000,
             title: "Uh oh!"
-        })
+        });
+        // Stop processing request
+        return;
     }
     /* Clear empty posts alert. */
     $("no-posts-alert").hide();
@@ -238,10 +245,6 @@ function postPost() {
         }
     });
     /* render(); */
-
-
-
-
 }
 
 
@@ -251,12 +254,8 @@ function postPost() {
 
 
 
-
-
-
-
-
-
+/* Init and render page via render(); and also display
+logged in notice. */
 $(function () {
 
     if (window.urlParams.has("loggedin")) {
@@ -297,6 +296,24 @@ function registerCommentHook(selector) {
                     postid: $(this).attr("data-id"),
                 },
                 success: function (data) {
+                    /* if more comments, then append link to go to seperate
+                    page for more comments                                 */
+
+                    if (data["more"] != -1) {
+                        // factory required! 
+                        moreCommentsLink = document.createElement("a");
+
+                        moreCommentsLinkIcon = document.createElement("i");
+                        moreCommentsLinkIcon.setAttribute("class", "fas fa-plus-square");
+
+                        moreCommentsText = document.createTextNode(" Show " + data["more"] + " more comments")
+
+                        moreCommentsLink.appendChild(moreCommentsLinkIcon);
+                        moreCommentsLink.appendChild(moreCommentsText);
+
+                        $("#commentbox" + this.postid)[0].append(moreCommentsLink);
+
+                    }
                     for (comment in data["comments"]) {
 
                         commentElement = genComment(data["comments"][comment]);
@@ -420,7 +437,7 @@ function postComment(button) {
             date: new Date(),
             /* author = window.username, */
             /* Not needed because the code can retrieve username from the */
-            /* window object.                                             */
+            /* window object without needing to go via this.commentData   */
         },
         success: function (data) {
             if (data["ok"]) {
@@ -429,7 +446,6 @@ function postComment(button) {
             }
             else {
                 /* Looks like the post has failed! */
-
 
                 /* the two checks that are implemented are the locked post and blank         */
                 /* comment check.                                                            */
@@ -442,13 +458,6 @@ function postComment(button) {
             // The below is the same comment renderer used for other comments too! //
 
             commentBox = $("#commentbox" + this.commentData["postId"])[0];
-
-
-
-
-
-
-
 
             commentBox.appendChild(genComment({
                 id: data["id"],
