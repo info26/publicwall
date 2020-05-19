@@ -86,6 +86,7 @@ def index(request):
                     "add-comment": request.user.has_perm("publicwall.add-comment"),
                 },
                 "userid": request.user.id,
+                "pages": p.num_pages,
             })
 
 
@@ -98,7 +99,15 @@ def index(request):
             refpost = Post.objects.get(pk=request.POST['postid'])
             
             comments = []
-            for comment in refpost.comment_set.all():
+            postComments = refpost.comment_set.all()
+            origSet = postComments
+            more = -1
+            if len(origSet) > 3:
+                # trim the set
+                postComments = postComments[:3]
+                more = len(origSet) - 3
+
+            for comment in postComments:
                 author = User.objects.filter(pk=comment.user)[0]
                 comments.append({
                     "content": comment.content,
@@ -110,6 +119,7 @@ def index(request):
             return JsonResponse({
                 "comments": comments,
                 "locked": Post.objects.get(pk=request.POST['postid']).locked,
+                "more": more,
             })
 
         # ---------------------------------

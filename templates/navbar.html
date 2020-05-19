@@ -12,7 +12,7 @@
   <!-- branding: :::: : :::-->
     <a class="navbar-brand" href="#"><!-- Navbar --> <i class="far fa-newspaper"></i></a>
     <!-- aria is not here.... too bad! -->
-    <button class="navbar-toggler" type="button" data-toggle="collapse">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar">
       <span class="navbar-toggler-icon"></span>
     </button>
     
@@ -30,7 +30,7 @@
 
     <!-- Remember, keep .nav-link when applying       -->
     <!-- .nav-link.bold                               -->
-    <div class="collapse navbar-collapse">
+    <div class="collapse navbar-collapse" id="mainNavbar">
         <!-- logged in navbar: -->
         <div style="display: none!important /* override */; width: 100%; justify-content: space-between;" id="nav-logged-in" class="d-flex">
             <ul class="navbar-nav justify-content-start d-flex">
