@@ -40,6 +40,7 @@ def index(request):
 
 
 
+
         # this function returns posts, and the user's timezone. , and some user permissions. 
         if request.POST['action'] == "getinfo":
             # Client asking for posts.
@@ -50,7 +51,7 @@ def index(request):
                 posts.append({
                     "date": post.date,
                     "content": post.content,
-                    "user": author.username,
+                    "author": author.username,
                     "pinned": post.pinned,
                     "locked": post.locked,
                     'comments': len(post.comment_set.all()),
@@ -68,7 +69,7 @@ def index(request):
                 posts.append({
                     "date": post.date,
                     "content": post.content,
-                    "user": author.username,
+                    "author": author.username,
                     "pinned": post.pinned,
                     "locked": post.locked,
                     'comments': len(post.comment_set.all()),
@@ -112,7 +113,7 @@ def index(request):
                 comments.append({
                     "content": comment.content,
                     "date": comment.date,
-                    "user": author.username,
+                    "author": author.username,
                     "id": comment.id,
                     "authorid": author.id
                 })
@@ -190,7 +191,7 @@ def index(request):
                 posts.append({
                     "date": post.date,
                     "content": post.content,
-                    "user": User.objects.filter(pk=post.user)[0].username,
+                    "author": User.objects.filter(pk=post.user)[0].username,
                     "pinned": post.pinned,
                     "locked": post.locked,
                     'comments': len(post.comment_set.all()),
