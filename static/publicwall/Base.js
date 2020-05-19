@@ -2,7 +2,83 @@ goog.require("com.info.Checkbox");
 
 
 goog.provide("com.info.Base");
+com.info.Base.registerPostingFunc = function() {
+    $(com.info.Base.postButton).click(function() {
+        /*
+        alert("Post content: " + $("#posttext").val());
+        */
+        if ($("#posttext").val() == "") {
+            commons.notify({
+                type: NOTICE_TYPES.ERROR,
+                msg: "Your post cannot be blank! ",
+                delay: 5000,
+                title: "Uh oh!"
+            });
+            // Stop processing request
+            return;
+        }
+        /* Clear empty posts alert. */
+        $("#no-posts-alert").hide();
 
+
+        $.ajax({
+            type: 'POST',
+            url: '',
+            data: {
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                action: "addpost",
+                content: $("#posttext").val()
+            },
+            postdata: {
+                content: $("#posttext").val(),
+            },
+            success: function (data) {
+                gennedPost = genPostElement({
+                    id: data["id"],
+                    content: this.postdata["content"],
+                    /* TODO: Change this VVV*/
+                    pinned: false,
+                    user: window.username,
+                    date: data["date"],
+                    /* Assume this post has 0 comments*/
+                    comments: 0,
+                    
+                })
+
+                /* Using pure DOM because jquery
+                seems to glitch out when querying children
+                and looping over the list. */
+                renderedPosts = $("#posts")[0].children;
+                firstNotPinned = null; 
+            
+                /* TODO: Plop post at top, if it is pinned */
+                for (post = 0; post < renderedPosts.length; post++) {
+                    /*if (typeof $(renderedPosts[post]).attr("pinned") == "undefined") {
+                        continue;
+                    }*/
+                    // console.log($(renderedPosts[post]).attr("pinned"));
+                    if ($(renderedPosts[post]).attr("pinned") == "false") {
+                        /* We found the first post that isn't pinned. YAY! */
+                        firstNotPinned = renderedPosts[post];
+                        break;
+                    }
+                }
+                if (firstNotPinned == null) {
+                    /* All the posts are pinned.... */
+                    /* so just plop it at the top   */
+                    $("#posts").prepend(gennedPost);
+                }
+                $(gennedPost).insertBefore(firstNotPinned);
+
+
+                /* There is probably a better way to do this.... 
+                TOO BAD!                                        */
+                registerCommentHook($(gennedPost).children(".showcomments"));
+                
+            }
+        });
+    })
+}
 com.info.Base.init = function() {
     /* apply active class to 'home' tab. */
     $("#home-nav-item").addClass("active")
@@ -57,6 +133,9 @@ com.info.Base.render = function() {
                 posttextbox.setAttribute("placeholder", settings.POST_PLACEHOLDER);
             }
             posttextbox.setAttribute("id", "posttext");
+
+            com.info.Base.textBox = posttextbox;
+
             $("#content").append(posttextbox);
 
 
@@ -76,8 +155,9 @@ com.info.Base.render = function() {
                     id: "lockPostCheckbox",
                     text: "Locked?"
                 });
-
+                com.info.Base.lockPost = lockPost;
                 lockPost = lockPost.getDom();
+                com.info.Base.lockPost = lockPost;
                 /* Slight spacing */
                 lockPost.classList.add("mr-2");
                 postControlBox.appendChild(lockPost);
@@ -86,10 +166,13 @@ com.info.Base.render = function() {
                     id: "pinPostCheckbox",
                     text: "Pinned?"
                 })
+                
                 pinPost = pinPost.getDom();
-
+                com.info.Base.pinPost = pinPost;
 
                 postControlBox.appendChild(pinPost);
+
+
 
                 $("#content").append(postControlBox);
 
@@ -110,6 +193,7 @@ com.info.Base.render = function() {
             } else {
                 postbutton.setAttribute("onclick", "postPost()");
             }
+            com.info.Base.postbutton = postbutton;
             $("#content").append(postbutton);
 
 
@@ -127,10 +211,8 @@ com.info.Base.render = function() {
 
 
                 Post = new com.info.Post(data["posts"][post]);
-                console.log(Post);
                 posteleDom = Post.getDom();
-                console.log(Post);
-                Post.registerCommentHook();
+                // Post.registerCommentHook();
                 // Appends the prepared element into the DOM tree.
                 $("#posts").append(posteleDom);
                 
@@ -150,9 +232,13 @@ com.info.Base.render = function() {
                 $("#content").append(br);
                 $("#content").append(br2);
                 $("#content").append(noPostsAlert);
+                com.info.Base.noPostsAlert = noPostsAlert;
             }
             //Call to continue initialization.
             // registerCommentHook('.showcomments');
+
+            /* call to register postPost(); */
+            com.info.Base.registerPostingFunc();
         },
     });
 }

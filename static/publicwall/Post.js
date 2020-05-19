@@ -106,6 +106,18 @@ com.info.Post.prototype.getDom = function() {
     postunderdiv.appendChild(postcommentdiv);
     postunderdiv.appendChild(postcontrolsdiv);
 
+
+    // start a comment handler
+    commentHandler = new com.info.CommentHandler({
+        "commentLink": postcommentlink,
+        "postId": this.id,
+        "commentBox": postcommentdiv,
+        "controlsBox": postcontrolsdiv,
+        "postUnder": postunderdiv,
+    });
+    // console.log(this.id);
+
+
     // Appends everything
     if (this.pinned) {
         postele.appendChild(pinnedBadge);

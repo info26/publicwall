@@ -1,7 +1,13 @@
+goog.provide("com.info.CommentHandler");
+
 com.info.CommentHandler = function(specs) {
     this.commentLink = specs["commentLink"];
+    this.postId = specs["postId"];
+    this.commentBox = specs["commentBox"];
+    this.controlsBox = specs["controlsBox"];
+    this.postUnder = specs["postUnder"];
     // reg comment hook
-    com.info.CommentHandler.registerCommentHook(this.commentLink);
+    this.registerCommentHook();
 }
 
 
@@ -9,96 +15,101 @@ com.info.CommentHandler = function(specs) {
 
 
 com.info.CommentHandler.prototype.registerSubmitFunc = function() {
-    // alert($(button).attr("data-post-id"));
-    // TODO: Send comment content to server.
+    $(this.submitButton).click({"commentHandler": this}, function(event){
+
+        // Make new comment element.
+
+        /* PostId needed to determine text */
+        postId = event.data.commentHandler.id;
+
+        /* Text needed here to determine post validity */
+        text = $(event.data.commentHandler.textBox).val();
+
+        id = 0;
 
 
-    // Make new comment element.
-
-    /* PostId needed to determine text */
-    postId = this.id;
-
-    /* Text needed here to determine post validity */
-    text = $("#textInput" + postId).val();
-
-    id = 0;
-
-
-    if (text == "") {
-        commons.notify({
-            "type": NOTICE_TYPES.ERROR,
-            "msg": "Your post cannot be blank!",
-            "title": "Uh oh!",
-            "delay": 5000
-        });
-        // stop processing this request.
-        return;
-    }
-
-    /* Start actually processing this request */
-    $.ajax({
-        type: 'POST',
-        url: '',
-        data: {
-            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
-            action: 'addcomment',
-            postId: parseInt($(button).attr("data-post-id")),
-            text: $("#textInput" + postId).val()
-        },
-        commentData: {
-            postId: parseInt($(button).attr("data-post-id")),
-            text: $("#textInput" + postId).val(),
-            date: new Date(),
-            /* author = window.username, */
-            /* Not needed because the code can retrieve username from the */
-            /* window object without needing to go via this.commentData   */
-        },
-        success: function (data) {
-            if (data["ok"]) {
-                /* Yay, this post has cleared. */
-                /* Nothing to do here!         */
-            }
-            else {
-                /* Looks like the post has failed! */
-
-                /* the two checks that are implemented are the locked post and blank         */
-                /* comment check.                                                            */
-                /* and these checks are implemented on the users's side as well as the       */
-                /* on the server side. If the user is tampering around with the code         */
-                /* just fail silently. (that's what they get when they tamper with code)     */
-
-
-            }
-            // The below is the same comment renderer used for other comments too! //
-
-            commentBox = $("#commentbox" + this.commentData["postId"])[0];
-
-            commentBox.appendChild(genComment({
-                id: data["id"],
-                content: this.commentData["text"],
-                date: data["date"],
-                user: window.username,
-                authorid: window.userid,
-            }))
-
-
-
-
+        if (text == "") {
+            commons.notify({
+                "type": NOTICE_TYPES.ERROR,
+                "msg": "Your post cannot be blank!",
+                "title": "Uh oh!",
+                "delay": 5000
+            });
+            // stop processing this request.
+            return;
         }
-    });
-    /* Clear the comment box's value. */
-    /* This goes AFTER post-ing the   */
-    /* backend because if i reset it  */
-    /* the script would give blank    */
-    /* to the backend because it      */
-    /* reads the text box again when  */
-    /* post-ing the server.           */
-    $("#textInput" + postId).val("");
+
+        /* Start actually processing this request */
+        $.ajax({
+            type: 'POST',
+            url: '',
+            commentHandler: event.data.commentHandler,
+            data: {
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                action: 'addcomment',
+                postId: parseInt(event.data.commentHandler.postId),
+                text: $(event.data.commentHandler.textBox).val()
+            },
+            commentData: {
+                postId: parseInt(event.data.commentHandler.postId),
+                text: $(event.data.commentHandler.textBox).val(),
+                date: new Date(),
+                /* author = window.username, */
+                /* Not needed because the code can retrieve username from the */
+                /* window object without needing to go via this.commentData   */
+            },
+            success: function (data) {
+                if (data["ok"]) {
+                    /* Yay, this post has cleared. */
+                    /* Nothing to do here!         */
+                }
+                else {
+                    /* Looks like the post has failed! */
+
+                    /* the two checks that are implemented are the locked post and blank         */
+                    /* comment check.                                                            */
+                    /* and these checks are implemented on the users's side as well as the       */
+                    /* on the server side. If the user is tampering around with the code         */
+                    /* just fail silently. (that's what they get when they tamper with code)     */
+
+
+                }
+                // The below is the same comment renderer used for other comments too! //
+                
+                commentBox = $(event.data.commentHandler.commentBox)[0];
+                console.log(commentBox);
+                comment = new com.info.Comment({
+                    id: data["id"],
+                    content: this.commentData["text"],
+                    date: data["date"],
+                    author: window.username,
+                    authorid: window.userid,
+                })
+
+                commentBox.append(
+                    comment.getDom()
+                );
+
+
+
+
+            }
+        });
+        /* Clear the comment box's value. */
+        /* This goes AFTER post-ing the   */
+        /* backend because if i reset it  */
+        /* the script would give blank    */
+        /* to the backend because it      */
+        /* reads the text box again when  */
+        /* post-ing the server.           */
+        $(event.data.commentHandler.textBox).val("");
+    })
 }
 
 com.info.CommentHandler.prototype.registerCommentHook = function() {
     // register hook for when a link to show comments is clicked.
-    $(this.postcommentlink).click(function () {
+    $(this.commentLink).click({"commentHandler": this}, 
+    function (event) {
         // TODO: Clean this up!
         commentBox = $("#postUnder" + $(this).attr("data-id"));
         if (commentBox.attr("loaded") == "true") {
@@ -114,16 +125,18 @@ com.info.CommentHandler.prototype.registerCommentHook = function() {
             }
         } else {
             // Get comments from server!
-            console.log(this);
             $.ajax({
                 type: 'POST',
                 url: '',
                 // passing data-id to the success func.
                 postid: $(this).attr("data-id"),
+                commentHandler: event.data.commentHandler,
                 data: {
                     csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
                     action: "getcomments",
                     postid: $(this).attr("data-id"),
+
+                    // commentHandler: this,
                 },
                 success: function (data) {
                     /* if more comments, then append link to go to seperate
@@ -141,7 +154,7 @@ com.info.CommentHandler.prototype.registerCommentHook = function() {
                         moreCommentsLink.appendChild(moreCommentsLinkIcon);
                         moreCommentsLink.appendChild(moreCommentsText);
 
-                        $("#commentbox" + this.postid)[0].append(moreCommentsLink);
+                        this.commentHandler.commentBox.append(moreCommentsLink);
 
                     }
                     for (comment in data["comments"]) {
@@ -149,7 +162,7 @@ com.info.CommentHandler.prototype.registerCommentHook = function() {
                         prep["postId"] = this.postId;
                         commentElement = new com.info.Comment(prep);
                         commentElement = commentElement.getDom();
-                        $("#commentbox" + this.postid)[0].append(commentElement);
+                        this.commentHandler.commentBox.append(commentElement);
 
                     }
 
@@ -166,7 +179,7 @@ com.info.CommentHandler.prototype.registerCommentHook = function() {
                         } else if (!data["locked"]) {
                             commentInputBox.setAttribute("placeholder", settings.COMMENT_PLACEHOLDER);
                         }
-                        this.InputBox = commentInputBox;
+                        this.commentHandler.textBox = commentInputBox;
 
                         // create button for adding post
                         commentSubmit = document.createElement("button");
@@ -183,19 +196,22 @@ com.info.CommentHandler.prototype.registerCommentHook = function() {
 
                         } else if (!data["locked"]) {
                             // only register click event if the post is not locked.
-                            commentSubmit.onclick()
+                            this.commentHandler.submitButton = commentSubmit;
+                            this.commentHandler.textBox = commentInputBox;
+                            // console.log(this.commentHandler);
+                            this.commentHandler.registerSubmitFunc();
                         }
 
                         commentSubmitText = document.createTextNode(settings.CREATE_COMMENT_TEXT);
                         commentSubmit.appendChild(commentSubmitText);
                         commentSubmit.setAttribute("class", "btn btn-primary comment-button");
                         commentSubmit.setAttribute("data-post-id", this.postid);
-                        this.commentSubmit = commentSubmit;
+                        this.commentHandler.commentSubmit = commentSubmit;
 
 
 
-                        $("#controlsbox" + this.postid)[0].appendChild(commentInputBox);
-                        $("#controlsbox" + this.postid)[0].appendChild(commentSubmit);
+                        $(this.commentHandler.controlsBox)[0].appendChild(commentInputBox);
+                        $(this.commentHandler.controlsBox)[0].appendChild(commentSubmit);
 
                     } else {
                         noPermission = document.createElement("i");
@@ -203,14 +219,13 @@ com.info.CommentHandler.prototype.registerCommentHook = function() {
                         noPermission.appendChild(noPermissionText);
                         noPermission.setAttribute("class", "text-muted");
 
-                        $("#controlsbox" + this.postid)[0].appendChild(noPermission);
+                        $(this.commentHandler.commentBox)[0].appendChild(noPermission);
                     }
 
 
-                    $("#postUnder" + this.postid).slideDown(settings.TOGGLE_SPEED);
-                    $("#postUnder" + this.postid).attr("shown", "true");
-                    $("#postUnder" + this.postid).attr("loaded", "true");
-
+                    $(this.commentHandler.postUnder).slideDown(settings.TOGGLE_SPEED);
+                    $(this.commentHandler.postUnder).attr("shown", "true");
+                    $(this.commentHandler.postUnder).attr("loaded", "true");
 
                     // These need to be done AFTER the element is appended to the div.
                     if (data["locked"] && window.userPermissions["add-comment"]) {
