@@ -2,6 +2,31 @@ goog.require("com.info.Checkbox");
 
 
 goog.provide("com.info.Base");
+
+
+com.info.Base.init = function() {
+    /* apply active class to 'home' tab. */
+    $("#home-nav-item").addClass("active")
+    /* Show logged in navbar */
+    $("#nav-logged-in").show();
+    if (window.urlParams.has("loggedin")) {
+        $(function() {
+            commons.notify({
+                type: NOTICE_TYPES.SUCCESS,
+                title: "You have logged in!",
+                delay: 5000,
+            });
+        })
+    }
+    com.info.Base.render();
+    com.info.Base.scrollListener();
+    com.info.Misc.initTextboxAutoExpand();
+}
+
+
+
+
+
 com.info.Base.registerPostingFunc = function() {
     $(com.info.Base.postButton).click(function() {
         /*
@@ -18,8 +43,17 @@ com.info.Base.registerPostingFunc = function() {
             return;
         }
         /* Clear empty posts alert. */
-        $("#no-posts-alert").hide();
 
+        $("#no-posts-alert").hide();
+        if (window.userPermissions["admin"]) {
+            /* Sort of a hacky way to do it */
+            
+            locked = $(com.info.Base.lockPost).find("input").is(":checked");
+            pinned = $(com.info.Base.pinPost).find("input").is(":checked");
+        } else {
+            locked = false;
+            pinned = false;
+        }
 
         $.ajax({
             type: 'POST',
@@ -27,18 +61,22 @@ com.info.Base.registerPostingFunc = function() {
             data: {
                 csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
                 action: "addpost",
-                content: $("#posttext").val()
+                content: $(com.info.Base.textBox).val(),
+                locked: locked,
+                pinned: pinned,
             },
             postdata: {
-                content: $("#posttext").val(),
+                content: $(com.info.Base.textBox).val(),
+                locked: locked,
+                pinned: pinned,
             },
             success: function (data) {
-                gennedPost = genPostElement({
+                gennedPost = new com.info.Post({
                     id: data["id"],
                     content: this.postdata["content"],
                     /* TODO: Change this VVV*/
-                    pinned: false,
-                    user: window.username,
+                    pinned: this.postdata.pinned,
+                    author: window.username,
                     date: data["date"],
                     /* Assume this post has 0 comments*/
                     comments: 0,
@@ -51,47 +89,31 @@ com.info.Base.registerPostingFunc = function() {
                 renderedPosts = $("#posts")[0].children;
                 firstNotPinned = null; 
             
-                /* TODO: Plop post at top, if it is pinned */
-                for (post = 0; post < renderedPosts.length; post++) {
-                    /*if (typeof $(renderedPosts[post]).attr("pinned") == "undefined") {
-                        continue;
-                    }*/
-                    // console.log($(renderedPosts[post]).attr("pinned"));
-                    if ($(renderedPosts[post]).attr("pinned") == "false") {
-                        /* We found the first post that isn't pinned. YAY! */
-                        firstNotPinned = renderedPosts[post];
-                        break;
+                if (pinned == false) {
+                    for (post = 0; post < renderedPosts.length; post++) {
+                        /*if (typeof $(renderedPosts[post]).attr("pinned") == "undefined") {
+                            continue;
+                        }*/
+                        // console.log($(renderedPosts[post]).attr("pinned"));
+                        if ($(renderedPosts[post]).attr("pinned") == "false") {
+                            /* We found the first post that isn't pinned. YAY! */
+                            firstNotPinned = renderedPosts[post];
+                            break;
+                        }
                     }
                 }
                 if (firstNotPinned == null) {
                     /* All the posts are pinned.... */
                     /* so just plop it at the top   */
-                    $("#posts").prepend(gennedPost);
+                    $("#posts").prepend(gennedPost.getDom());
                 }
-                $(gennedPost).insertBefore(firstNotPinned);
+                $(gennedPost.getDom()).insertBefore(firstNotPinned);
+                $(com.info.Base.textBox).val('');
 
-
-                /* There is probably a better way to do this.... 
-                TOO BAD!                                        */
-                registerCommentHook($(gennedPost).children(".showcomments"));
                 
             }
         });
     })
-}
-com.info.Base.init = function() {
-    /* apply active class to 'home' tab. */
-    $("#home-nav-item").addClass("active")
-    /* Show logged in navbar */
-    $("#nav-logged-in").show();
-    if (window.urlParams.has("loggedin")) {
-        commons.notify({
-            type: NOTICE_TYPES.SUCCESS,
-            title: "You have logged in!",
-            delay: 5000,
-        });
-    }
-    com.info.Base.render();
 }
 
 com.info.Base.render = function() {
@@ -150,28 +172,28 @@ com.info.Base.render = function() {
                 postControlBox.setAttribute("class", "form-inline");
 
                 /* group1 = document.createElement("div"); */
+                if (window.userPermissions["admin"]) {
+                    lockPost = new com.info.Checkbox({
+                        id: "lockPostCheckbox",
+                        text: "Locked?"
+                    });
+                    com.info.Base.lockPost = lockPost;
+                    lockPost = lockPost.getDom();
+                    com.info.Base.lockPost = lockPost;
+                    /* Slight spacing */
+                    lockPost.classList.add("mr-2");
+                    postControlBox.appendChild(lockPost);
 
-                lockPost = new com.info.Checkbox({
-                    id: "lockPostCheckbox",
-                    text: "Locked?"
-                });
-                com.info.Base.lockPost = lockPost;
-                lockPost = lockPost.getDom();
-                com.info.Base.lockPost = lockPost;
-                /* Slight spacing */
-                lockPost.classList.add("mr-2");
-                postControlBox.appendChild(lockPost);
+                    pinPost = new com.info.Checkbox({
+                        id: "pinPostCheckbox",
+                        text: "Pinned?"
+                    })
+                    
+                    pinPost = pinPost.getDom();
+                    com.info.Base.pinPost = pinPost;
 
-                pinPost = new com.info.Checkbox({
-                    id: "pinPostCheckbox",
-                    text: "Pinned?"
-                })
-                
-                pinPost = pinPost.getDom();
-                com.info.Base.pinPost = pinPost;
-
-                postControlBox.appendChild(pinPost);
-
+                    postControlBox.appendChild(pinPost);
+                }
 
 
                 $("#content").append(postControlBox);
@@ -191,9 +213,9 @@ com.info.Base.render = function() {
                 postbutton.setAttribute("tabindex", 0);
                 postbutton.setAttribute("data-trigger", "focus");
             } else {
-                postbutton.setAttribute("onclick", "postPost()");
+                com.info.Base.registerPostingFunc;
             }
-            com.info.Base.postbutton = postbutton;
+            com.info.Base.postButton = postbutton;
             $("#content").append(postbutton);
 
 
@@ -241,4 +263,39 @@ com.info.Base.render = function() {
             com.info.Base.registerPostingFunc();
         },
     });
+};
+
+
+com.info.Base.scrollListener = function() {
+    // init page rendered to 0;
+    com.info.Base.pageRendered = 1;
+    $(window).scroll(function() {
+        if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
+            if (com.info.Base.pageRendered == -1) {
+                return;
+            }
+            com.info.Base.pageRendered++;
+            $.ajax({
+                type: 'POST',
+                url: '',
+                data: {
+                    csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                    action: "getmoreposts",
+                    page: com.info.Base.pageRendered,
+                },
+                success: function(data) {
+                    if (data["more"] == false) {
+                        // no more pages. 
+                        com.info.Base.pageRendered = -1;
+                    }
+                    for (post in data["posts"]) {
+    
+                        postele = new com.info.Post(data["posts"][post]);
+                        // Appends the prepared element into the DOM tree.
+                        $("#posts").append(postele.getDom());
+                    }
+                }
+            });
+        }
+    })
 }

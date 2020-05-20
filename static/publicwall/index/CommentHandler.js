@@ -6,6 +6,7 @@ com.info.CommentHandler = function(specs) {
     this.commentBox = specs["commentBox"];
     this.controlsBox = specs["controlsBox"];
     this.postUnder = specs["postUnder"];
+    this.post = specs["post"];
     // reg comment hook
     this.registerCommentHook();
 }
@@ -76,8 +77,8 @@ com.info.CommentHandler.prototype.registerSubmitFunc = function() {
                 }
                 // The below is the same comment renderer used for other comments too! //
                 
-                commentBox = $(event.data.commentHandler.commentBox)[0];
-                console.log(commentBox);
+                commentBox = $(this.commentHandler.commentBox)[0];
+                // console.log(commentBox);
                 comment = new com.info.Comment({
                     id: data["id"],
                     content: this.commentData["text"],
@@ -173,10 +174,10 @@ com.info.CommentHandler.prototype.registerCommentHook = function() {
                         // set style
                         commentInputBox.setAttribute("class", "form-control");
                         commentInputBox.setAttribute("id", "textInput" + this.postid);
-                        if (data["locked"]) {
+                        if (data["locked"] && !window.userPermissions["admin"]) {
                             commentInputBox.setAttribute("disabled", true);
                             commentInputBox.setAttribute("placeholder", settings.POST_LOCKED_PLACEHOLDER);
-                        } else if (!data["locked"]) {
+                        } else if (!data["locked"] ||  window.userPermissions["admin"]) {
                             commentInputBox.setAttribute("placeholder", settings.COMMENT_PLACEHOLDER);
                         }
                         this.commentHandler.textBox = commentInputBox;
@@ -184,7 +185,11 @@ com.info.CommentHandler.prototype.registerCommentHook = function() {
                         // create button for adding post
                         commentSubmit = document.createElement("button");
 
-                        if (data["locked"]) {
+
+
+
+
+                        if (data["locked"] && !window.userPermissions["admin"]) {
                             // commentSubmit.setAttribute("disabled", true);
 
                             // init popover.
@@ -194,13 +199,16 @@ com.info.CommentHandler.prototype.registerCommentHook = function() {
                             commentSubmit.setAttribute("tabindex", 0);
                             commentSubmit.setAttribute("data-trigger", "focus");
 
-                        } else if (!data["locked"]) {
+                        } else if (!data["locked"] || window.userPermissions["admin"]) {
                             // only register click event if the post is not locked.
                             this.commentHandler.submitButton = commentSubmit;
                             this.commentHandler.textBox = commentInputBox;
                             // console.log(this.commentHandler);
                             this.commentHandler.registerSubmitFunc();
                         }
+
+
+
 
                         commentSubmitText = document.createTextNode(settings.CREATE_COMMENT_TEXT);
                         commentSubmit.appendChild(commentSubmitText);

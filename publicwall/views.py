@@ -10,7 +10,13 @@ from django.utils import timezone
 from . import admin
 import pytz
 from django.core.paginator import Paginator
-
+def fixBool(bool):
+    if bool == "true":
+        return True
+    elif bool == "false":
+        return False
+    else:
+        return False
 def index(request):
     # this should be at the tippy top. 
     # First, we check if the user is logged in or not.
@@ -137,12 +143,20 @@ def index(request):
                     "ok": False,
                     "error": "no permission"
                 })
+            if request.POST["locked"] and not request.user.has_perm("publicwall.admin"):
+                locked = False
+            else:
+                locked = fixBool(request.POST["locked"])
+            if request.POST["pinned"] and not request.user.has_perm("publicwall.admin"):
+                pinned = False
+            else:
+                pinned = fixBool(request.POST["pinned"])
             newPost = Post.objects.create(
                 content = request.POST["content"],
                 user = request.user.id,
                 date = timezone.now(),
-                pinned = False,
-                locked = False
+                pinned = pinned,
+                locked = locked
             )
             return JsonResponse({
                 "id": newPost.id,

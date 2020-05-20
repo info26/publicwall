@@ -114,6 +114,7 @@ com.info.Post.prototype.getDom = function() {
         "commentBox": postcommentdiv,
         "controlsBox": postcontrolsdiv,
         "postUnder": postunderdiv,
+        "post": this,
     });
     // console.log(this.id);
 

@@ -23,10 +23,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 /* server gives page1 first, so set window.pageRendered to 1 */
 /* window.pageRendered = 1; */
 
-/* apply active class to 'home' tab. */
-$("#home-nav-item").addClass("active")
-/* Show logged in navbar */
-$("#nav-logged-in").show();
+
 
 
 
@@ -37,133 +34,7 @@ $("#nav-logged-in").show();
  * the user initially sees. 
  */
 function render() {
-    $.ajax({
-        type: "POST",
-        url: "",
-        data: {
-            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
-            action: "getinfo"
-        },
-        success: function (data) {
-            $("#content").empty();
-            // write user's tz
-            window.tz = data["tz"];
-            window.username = data["username"];
-            window.userid = data["userid"];
-            // write user perms 
-            window.userPermissions = data["permissionList"];
 
-            // console.log(data);
-
-
-            if (data["pages"] == 1) {
-                // No more pages!
-                window.pageRendered = -1;
-            } else {
-                // there are more pages! 
-                window.pageRendered = 1;
-            }
-            // text box to post things.
-            //
-            posttextbox = document.createElement("textarea");
-            posttextbox.setAttribute("class", "form-control");
-            if (!window.userPermissions["add-post"]) {
-                // wait, this user doesn't have permission to add a post !!!!! //
-                posttextbox.setAttribute("disabled", true);
-                posttextbox.setAttribute("placeholder", settings.POST_DISABLED_PLACEHOLDER);
-            } else {
-                posttextbox.setAttribute("placeholder", settings.POST_PLACEHOLDER);
-            }
-            posttextbox.setAttribute("id", "posttext");
-            $("#content").append(posttextbox);
-
-
-
-
-            // locking / pinning:
-            // locking:
-            if (window.userPermissions["add-post"]) {
-
-                postControlBox = document.createElement("div");
-                postControlBox.setAttribute("class", "form-inline");
-
-                /* group1 = document.createElement("div"); */
-
-                lockPost = genCheckbox({
-                    id: "lockPostCheckbox",
-                    text: "Locked?"
-                });
-                /* Slight spacing */
-                lockPost.classList.add("mr-2");
-                postControlBox.appendChild(lockPost);
-
-                pinPost = genCheckbox({
-                    id: "pinPostCheckbox",
-                    text: "Pinned?"
-                })
-
-
-                postControlBox.appendChild(pinPost);
-
-                $("#content").append(postControlBox);
-
-            }
-
-
-
-            // button to submit text box content: 
-            postbutton = document.createElement("button");
-            postbuttontext = document.createTextNode(settings.POST_POST_BUTTON_TEXT);
-            postbutton.appendChild(postbuttontext);
-            postbutton.setAttribute("class", "btn btn-primary post-button");
-            if (!window.userPermissions["add-post"]) {
-                postbutton.setAttribute("data-toggle", "popover");
-                postbutton.setAttribute("data-content", settings.CANT_POST_POPOVER_CONTENT);
-                postbutton.setAttribute("tabindex", 0);
-                postbutton.setAttribute("data-trigger", "focus");
-            } else {
-                postbutton.setAttribute("onclick", "postPost()");
-            }
-            $("#content").append(postbutton);
-
-
-            // initing the post button popover: if no permission to post: 
-            // for some reason, these need to be done AFTEr the element 
-            // is appended the the dom tree. 
-            if (!window.userPermissions["add-post"]) {
-                $(postbutton).popover();
-                postbutton.setAttribute("title", settings.CANT_POST_POPOVER_TITLE);
-            }
-
-
-            for (post in data["posts"]) {
-
-
-
-                postele = genPostElement(data["posts"][post]);
-                // Appends the prepared element into the DOM tree.
-                $("#posts").append(postele);
-
-
-
-            }
-
-            if (data["posts"].length == 0) {
-                br = document.createElement("br");
-                br2 = document.createElement("br");
-                noPostsAlert = document.createElement("div");
-                noPostsAlert.setAttribute("class", "alert alert-primary");
-                noPostsAlertText = document.createTextNode(settings.NO_POSTS_ALERT_TEXT);
-                noPostsAlert.appendChild(noPostsAlertText);
-                noPostsAlert.setAttribute("id", "no-posts-alert");
-                $("#content").append(br);
-                $("#content").append(br2);
-                $("#content").append(noPostsAlert);
-            }
-            //Call to continue initialization.
-            registerCommentHook('.showcomments');
-        },
-    });
 }
 /* 
  * postPost()
@@ -258,14 +129,7 @@ function postPost() {
 logged in notice. */
 $(function () {
 
-    if (window.urlParams.has("loggedin")) {
-        commons.notify({
-            type: NOTICE_TYPES.SUCCESS,
-            title: "You have logged in!",
-            delay: 5000,
-        });
-    }
-    render();
+
 });
 function registerCommentHook(selector) {
     // register hook for when a link to show comments is clicked.
@@ -395,91 +259,7 @@ function registerCommentHook(selector) {
 }
 
 function postComment(button) {
-    // alert($(button).attr("data-post-id"));
-    // TODO: Send comment content to server.
 
-
-    // Make new comment element.
-
-    /* PostId needed to determine text */
-    postId = parseInt($(button).attr("data-post-id"));
-
-    /* Text needed here to determine post validity */
-    text = $("#textInput" + postId).val();
-
-    id = 0;
-
-
-    if (text == "") {
-        commons.notify({
-            "type": NOTICE_TYPES.ERROR,
-            "msg": "Your post cannot be blank!",
-            "title": "Uh oh!",
-            "delay": 5000
-        });
-        // stop processing this request.
-        return;
-    }
-
-    /* Start actually processing this request */
-    $.ajax({
-        type: 'POST',
-        url: '',
-        data: {
-            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
-            action: 'addcomment',
-            postId: parseInt($(button).attr("data-post-id")),
-            text: $("#textInput" + postId).val()
-        },
-        commentData: {
-            postId: parseInt($(button).attr("data-post-id")),
-            text: $("#textInput" + postId).val(),
-            date: new Date(),
-            /* author = window.username, */
-            /* Not needed because the code can retrieve username from the */
-            /* window object without needing to go via this.commentData   */
-        },
-        success: function (data) {
-            if (data["ok"]) {
-                /* Yay, this post has cleared. */
-                /* Nothing to do here!         */
-            }
-            else {
-                /* Looks like the post has failed! */
-
-                /* the two checks that are implemented are the locked post and blank         */
-                /* comment check.                                                            */
-                /* and these checks are implemented on the users's side as well as the       */
-                /* on the server side. If the user is tampering around with the code         */
-                /* just fail silently. (that's what they get when they tamper with code)     */
-
-
-            }
-            // The below is the same comment renderer used for other comments too! //
-
-            commentBox = $("#commentbox" + this.commentData["postId"])[0];
-
-            commentBox.appendChild(genComment({
-                id: data["id"],
-                content: this.commentData["text"],
-                date: data["date"],
-                user: window.username,
-                authorid: window.userid,
-            }))
-
-
-
-
-        }
-    });
-    /* Clear the comment box's value. */
-    /* This goes AFTER post-ing the   */
-    /* backend because if i reset it  */
-    /* the script would give blank    */
-    /* to the backend because it      */
-    /* reads the text box again when  */
-    /* post-ing the server.           */
-    $("#textInput" + postId).val("");
 
 
 }
