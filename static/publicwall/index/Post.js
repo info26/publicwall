@@ -13,7 +13,7 @@ com.info.Post = function(specs) {
 com.info.Post.prototype.getDom = function() {
     br = document.createElement("br")
     // floating a br right causes problems
-    // in firefox. 
+    // in firefox.
 
     br2 = document.createElement("br")
 
@@ -24,15 +24,35 @@ com.info.Post.prototype.getDom = function() {
     postele = document.createElement("div")
     // -----------------
 
-    // pinned badge: 
+    // pinned badge:
     if (this.pinned) {
         // This post is pinned
+        /*
         pinnedBadge = document.createElement("span");
         pinnedBadge.setAttribute("class", "badge badge-primary");
         pinnedBadgeIcon = document.createElement("i");
         pinnedBadgeIcon.setAttribute("class", "fas fa-thumbtack");
         pinnedBadge.appendChild(pinnedBadgeIcon);
         pinnedBadgeText = document.createTextNode(" PINNED");
+        */
+        /* com.info.Dom */
+        pinnedBadge = com.info.Dom({
+            "tag": "span",
+            "attrs": {
+                "class": "badge badge-primary"
+            },
+            children: [
+                {
+                    "tag": "i",
+                    "attrs": {
+                        "class": "fas fa-thumbtack"
+                    }
+                },
+                {
+                    "text": " PINNED"
+                }
+            ]
+        })
         pinnedBadge.appendChild(pinnedBadgeText);
     }
 
