@@ -1,31 +1,34 @@
-goog.provide("com.info.dom");
-/// more efficient dom creation! ///
-com.info.dom = function(specs){
-    
+goog.provide("com.info.Dom");
+// simple script to generate dom elements.
+com.info.Dom = function(specs){
+
     if ("text" in specs) {
-        // this is a text node. 
+        // this is a text node.
         let text = document.createTextNode(specs["text"]);
         return text;
     }
     if ("tag" in specs) {
-        // fill in blanks
-        if (!"attrs" in specs) {
-            specs["attrs"] = {};
-        }
-        if (!"children" in specs) {
-            specs["children"] = [];
-        }
-        // this is a html node. 
+        // more efficient way to do it?
+        // i don't know.
+        specs["attrs"] = specs["attrs"] ? specs["attrs"] : {};
+        specs["children"] = specs["children"] ? specs["children"] : [];
+        specs["styles"] = specs["styles"] ? specs["styles"] : {};
+        specs["classes"] = specs["classes"] ? specs["classes"] : [];
+        // this is a html node.
+        // hoisting is bad!!!!!!!
         let node = document.createElement(specs["tag"]);
         // set attrs
         for (attr in specs["attrs"]) {
             node.setAttribute(attr, specs["attrs"][attr]);
         }
+        for (style in specs["styles"]) {
+            node.style[style] = specs["styles"][style];
+        }
         for (child in specs["children"]) {
-            let childnode = com.info.dom(specs["children"][child]);
+            let childnode = com.info.Dom(specs["children"][child]);
             node.appendChild(childnode);
         }
         return node;
-        
+
     }
 }

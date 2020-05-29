@@ -10,16 +10,22 @@ com.info.Base.init = function() {
     /* Show logged in navbar */
     $("#nav-logged-in").show();
     if (window.urlParams.has("loggedin")) {
-        $(function() {
-            commons.notify({
-                type: NOTICE_TYPES.SUCCESS,
-                title: "You have logged in!",
-                delay: 5000,
-            });
-        })
+        // no need to wait for the 
+        // documentReady event. 
+        // init() gets called by the
+        // documentReady event :p 
+        commons.notify({
+            type: NOTICE_TYPES.SUCCESS,
+            title: "You have logged in!",
+            delay: 5000,
+        });
     }
+    // render the initial stuff eg. posts and the posting textbox
     com.info.Base.render();
+    // register the scroll listener -- to load more posts when user scrolls
+    // to bottom of page. 
     com.info.Base.scrollListener();
+    // auto expand text boxes. 
     com.info.Misc.initTextboxAutoExpand();
 }
 
@@ -43,11 +49,13 @@ com.info.Base.registerPostingFunc = function() {
             return;
         }
         /* Clear empty posts alert. */
-
+        /* This won't error out as
+        jquery is perfectly fine when it can't find
+        the element i'm looking for.               */
         $("#no-posts-alert").hide();
         if (window.userPermissions["admin"]) {
             /* Sort of a hacky way to do it */
-            
+
             locked = $(com.info.Base.lockPost).find("input").is(":checked");
             pinned = $(com.info.Base.pinPost).find("input").is(":checked");
         } else {
@@ -80,15 +88,15 @@ com.info.Base.registerPostingFunc = function() {
                     date: data["date"],
                     /* Assume this post has 0 comments*/
                     comments: 0,
-                    
+
                 })
 
                 /* Using pure DOM because jquery
                 seems to glitch out when querying children
                 and looping over the list. */
                 renderedPosts = $("#posts")[0].children;
-                firstNotPinned = null; 
-            
+                firstNotPinned = null;
+
                 if (pinned == false) {
                     for (post = 0; post < renderedPosts.length; post++) {
                         /*if (typeof $(renderedPosts[post]).attr("pinned") == "undefined") {
@@ -110,7 +118,7 @@ com.info.Base.registerPostingFunc = function() {
                 $(gennedPost.getDom()).insertBefore(firstNotPinned);
                 $(com.info.Base.textBox).val('');
 
-                
+
             }
         });
     })
@@ -130,7 +138,7 @@ com.info.Base.render = function() {
             window.tz = data["tz"];
             window.username = data["username"];
             window.userid = data["userid"];
-            // write user perms 
+            // write user perms
             window.userPermissions = data["permissionList"];
 
             // console.log(data);
@@ -138,10 +146,10 @@ com.info.Base.render = function() {
 
             if (data["pages"] == 1) {
                 // No more pages!
-                window.pageRendered = -1;
+                com.info.Base.pageRendered = -1;
             } else {
-                // there are more pages! 
-                window.pageRendered = 1;
+                // there are more pages!
+                com.info.Base.pageRendered = 1;
             }
             // text box to post things.
             //
@@ -165,7 +173,7 @@ com.info.Base.render = function() {
 
             // locking / pinning:
             // locking:
-            
+
             if (window.userPermissions["add-post"]) {
 
                 postControlBox = document.createElement("div");
@@ -188,7 +196,7 @@ com.info.Base.render = function() {
                         id: "pinPostCheckbox",
                         text: "Pinned?"
                     })
-                    
+
                     pinPost = pinPost.getDom();
                     com.info.Base.pinPost = pinPost;
 
@@ -202,26 +210,29 @@ com.info.Base.render = function() {
 
 
 
-            // button to submit text box content: 
+            // button to submit text box content:
             postbutton = document.createElement("button");
             postbuttontext = document.createTextNode(settings.POST_POST_BUTTON_TEXT);
             postbutton.appendChild(postbuttontext);
             postbutton.setAttribute("class", "btn btn-primary post-button");
+            com.info.Base.postButton = postbutton;
+            $("#content").append(postbutton);
+
+
             if (!window.userPermissions["add-post"]) {
                 postbutton.setAttribute("data-toggle", "popover");
                 postbutton.setAttribute("data-content", settings.CANT_POST_POPOVER_CONTENT);
                 postbutton.setAttribute("tabindex", 0);
                 postbutton.setAttribute("data-trigger", "focus");
             } else {
-                com.info.Base.registerPostingFunc;
+                com.info.Base.registerPostingFunc();
             }
-            com.info.Base.postButton = postbutton;
-            $("#content").append(postbutton);
 
 
-            // initing the post button popover: if no permission to post: 
-            // for some reason, these need to be done AFTEr the element 
-            // is appended the the dom tree. 
+
+            // initing the post button popover: if no permission to post:
+            // for some reason, these need to be done AFTEr the element
+            // is appended the the dom tree.
             if (!window.userPermissions["add-post"]) {
                 $(postbutton).popover();
                 postbutton.setAttribute("title", settings.CANT_POST_POPOVER_TITLE);
@@ -237,7 +248,7 @@ com.info.Base.render = function() {
                 // Post.registerCommentHook();
                 // Appends the prepared element into the DOM tree.
                 $("#posts").append(posteleDom);
-                
+
 
 
 
@@ -259,8 +270,6 @@ com.info.Base.render = function() {
             //Call to continue initialization.
             // registerCommentHook('.showcomments');
 
-            /* call to register postPost(); */
-            com.info.Base.registerPostingFunc();
         },
     });
 };
@@ -285,11 +294,11 @@ com.info.Base.scrollListener = function() {
                 },
                 success: function(data) {
                     if (data["more"] == false) {
-                        // no more pages. 
+                        // no more pages.
                         com.info.Base.pageRendered = -1;
                     }
                     for (post in data["posts"]) {
-    
+
                         postele = new com.info.Post(data["posts"][post]);
                         // Appends the prepared element into the DOM tree.
                         $("#posts").append(postele.getDom());

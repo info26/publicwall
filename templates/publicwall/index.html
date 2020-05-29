@@ -3,12 +3,14 @@
 <link rel="stylesheet" href="/static/publicwall/index/index.css">
 <!-- -->
 <script>
-    window.PAGE_ID = "index"; 
+    window.PAGE_ID = "index";
 </script>
 <!--
 <script src="/static/publicwall/elegen.closure.js"></script>
 <script src="/static/publicwall/index.closure.js"></script>
 -->
+<!-- DOM -->
+
 <script src="/static/publicwall/index/CommentHandler.js"></script>
 <script src="/static/publicwall/index/Checkbox.js"></script>
 <script src="/static/publicwall/index/Base.js"></script>
@@ -17,7 +19,10 @@
 <script src="/static/publicwall/index/Misc.js"></script>
 <script>
     /* init */
-    com.info.Base.init();
+    // run init script onReady
+    $(function(){
+        com.info.Base.init()
+    });
 </script>
 <div class="container">
     <div class="row">
@@ -27,7 +32,7 @@
 
             </div>
             <div id="posts">
-                
+
             </div>
         </div>
     </div>

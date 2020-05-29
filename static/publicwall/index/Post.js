@@ -27,14 +27,6 @@ com.info.Post.prototype.getDom = function() {
     // pinned badge:
     if (this.pinned) {
         // This post is pinned
-        /*
-        pinnedBadge = document.createElement("span");
-        pinnedBadge.setAttribute("class", "badge badge-primary");
-        pinnedBadgeIcon = document.createElement("i");
-        pinnedBadgeIcon.setAttribute("class", "fas fa-thumbtack");
-        pinnedBadge.appendChild(pinnedBadgeIcon);
-        pinnedBadgeText = document.createTextNode(" PINNED");
-        */
         /* com.info.Dom */
         pinnedBadge = com.info.Dom({
             "tag": "span",
@@ -52,19 +44,24 @@ com.info.Post.prototype.getDom = function() {
                     "text": " PINNED"
                 }
             ]
-        })
-        pinnedBadge.appendChild(pinnedBadgeText);
+        });
     }
 
 
     // The content of the post:
     // ------------------------
-    posttext = document.createElement("span")
-    posttexttext = document.createTextNode(this.content);
-    posttext.appendChild(posttexttext);
-    posttext.setAttribute("id", "posttext" + this.id)
-    posttext.setAttribute("style", "word-wrap: break-word; overflow: hidden;")
-
+    posttext = com.info.Dom({
+        "tag": "span",
+        "attrs": {
+            "id": "posttext" + this.id,
+            "style": "word-wrap: break-word; overflow: hidden;"
+        },
+        children: [
+            {
+                "text": this.content
+            }
+        ]
+    });
 
 
     // The date of the post
@@ -72,40 +69,70 @@ com.info.Post.prototype.getDom = function() {
     postdate = document.createElement("span");
 
     localized = commons.localizeTime(this.date, window.tz);
-    postdatetext = document.createTextNode(localized.format(settings.DATE_FORMAT))
-    postdate.appendChild(postdatetext)
-    postdate.setAttribute("id", "postdate" + this.id)
-    postdate.setAttribute("class", "float-right")
+    postdatetext = localized.format(settings.DATE_FORMAT);
 
+    postdate = com.info.Dom({
+        "tag": "span",
+        "attrs": {
+            "id": "postdate" + this.id,
+            "class": "float-right"
+        },
+        children: [
+            {
+                "text": postdatetext
+            }
+        ]
+    });
 
 
     // The author of the post
     // ----------------------
-    postauthor = document.createElement("span");
-    postauthor.setAttribute("onclick", "showProfile(" + this.authorid + ")");
-    postauthortext = document.createTextNode(this.author)
-    postauthor.setAttribute("class", "grey float-right")
-    postauthor.appendChild(postauthortext);
-    postauthor.setAttribute("id", "postauthor" + this.id)
-
+    postauthor = com.info.Dom({
+        "tag": "span",
+        "attrs": {
+            "id": "postauthor" + this.id,
+            "class": "grey float-right",
+            "onclick": "showProfile(" + this.authorid + ")"
+        },
+        "children": [
+            {
+                "text": this.author
+            }
+        ]
+    });
 
     // The link for the comment. <a>Comments [1]</a>
     // ---------------------------------------------
-    postcommentlink = document.createElement("a")
-    postcommenttext = document.createTextNode("Comments[" + this.comments + "]")
-    postcommentlink.appendChild(postcommenttext);
-    postcommentlink.setAttribute("id", "postcomment" + this.id)
-    postcommentlink.setAttribute("class", "link showcomments")
-    postcommentlink.setAttribute("data-id", this.id)
+    postcommentlink = com.info.Dom({
+        "tag": "a",
+        "attrs": {
+            "id": "postcomment" + this.id,
+            "class": "link showcomments",
+            "data-id": this.id
+        },
+        children: [
+            {
+                "text": "Comments[" + this.comments + "]"
+            }
+        ]
+    });
+
+
 
 
     // div for everything under post.
     postunderdiv = document.createElement("div");
-    postunderdiv.setAttribute("id", "postUnder" + this.id);
-    postunderdiv.setAttribute("class", "postUnder");
-    postunderdiv.style.height = "0%";
-    postunderdiv.style.display = "none";
-
+    postunderdiv = com.info.Dom({
+        "tag": "div",
+        "attrs": {
+            "id": "postUnder" + this.id,
+            "class": "postUnder"
+        },
+        "styles": {
+            "height": "0%",
+            "display": "none"
+        }
+    });
 
 
 
