@@ -21,7 +21,7 @@ $("#login-nav-item").addClass("active");
 $("#login-form").submit(function() {
     $.ajax({
         type: "POST",
-	    // all AJAX calls on a page will go to that page's url, with an "action" parameter. 1
+        // all AJAX calls on a page will go to that page's url, with an "action" parameter. 1
         url: "",
         data: {
             csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
@@ -45,3 +45,4 @@ $("#login-form").submit(function() {
     });
     event.preventDefault();
 })
+
