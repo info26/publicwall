@@ -1,7 +1,4 @@
-goog.require("com.info.Checkbox");
-
-
-goog.provide("com.info.Base");
+bare.initNamespace("com.info.Base");
 
 
 com.info.Base.init = function() {

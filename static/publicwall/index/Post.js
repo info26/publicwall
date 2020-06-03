@@ -1,4 +1,4 @@
-goog.provide("com.info.Post")
+bare.initNamespace("com.info.Post")
 
 com.info.Post = function(specs) {
     this.pinned = specs["pinned"];
@@ -137,11 +137,15 @@ com.info.Post.prototype.getDom = function() {
 
 
     // Div for the comment box
-    postcommentdiv = document.createElement("div")
-    postcommentdiv.setAttribute("data-id", this.id);
-    postcommentdiv.setAttribute("loaded", false);
-    postcommentdiv.setAttribute("id", "commentbox" + this.id)
-    postcommentdiv.setAttribute("class", "commentbox");
+    postcommentdiv = com.info.Dom({
+        "tag": "div",
+        "attrs": {
+            "data-id": this.id,
+            "loaded": false,
+            "id": "commentbox" + this.id,
+            "class": "commentbox"
+        }
+    });
 
     //Div for comment controls box. eg. textbox for form and button
     // to add comment.

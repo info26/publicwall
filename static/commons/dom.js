@@ -1,4 +1,4 @@
-goog.provide("com.info.Dom");
+bare.initNamespace("com.info.Dom");
 // simple script to generate dom elements.
 com.info.Dom = function(specs){
 

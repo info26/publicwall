@@ -1,4 +1,4 @@
-goog.provide("com.info.Misc");
+bare.initNamespace("com.info.Misc");
 
 
 

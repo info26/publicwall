@@ -1,4 +1,4 @@
-goog.provide("com.info.Comment");
+bare.initNamespace("com.info.Comment");
 
 com.info.Comment = function(specs) {
     this.content = specs["content"];

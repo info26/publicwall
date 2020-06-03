@@ -1,4 +1,4 @@
-goog.provide("com.info.Checkbox");
+bare.initNamespace("com.info.Checkbox");
 
 com.info.Checkbox = function(specs) {
     this.id = specs["id"];

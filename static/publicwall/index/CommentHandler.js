@@ -1,4 +1,4 @@
-goog.provide("com.info.CommentHandler");
+bare.initNamespace("com.info.CommentHandler");
 
 com.info.CommentHandler = function(specs) {
     this.commentLink = specs["commentLink"];
