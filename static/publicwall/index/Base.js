@@ -1,4 +1,4 @@
-bare.initNamespace("com.info.Base");
+choco.bare.initNamespace("com.info.Base");
 
 
 com.info.Base.init = function() {
@@ -237,18 +237,11 @@ com.info.Base.render = function() {
 
 
             for (post in data["posts"]) {
-
-
-
                 Post = new com.info.Post(data["posts"][post]);
                 posteleDom = Post.getDom();
                 // Post.registerCommentHook();
                 // Appends the prepared element into the DOM tree.
                 $("#posts").append(posteleDom);
-
-
-
-
             }
 
             if (data["posts"].length == 0) {
