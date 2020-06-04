@@ -1,3 +1,4 @@
+
 // ------------------------------------
 choco.bare.initNamespace("choco.dom");
 // simple script to generate dom elements.
@@ -25,7 +26,7 @@ choco.dom.domGen = function(specs){
             node.style[style] = specs["styles"][style];
         }
         for (child in specs["children"]) {
-            var childnode = com.info.Dom(specs["children"][child]);
+            var childnode = choco.dom.domGen(specs["children"][child]);
             node.appendChild(childnode);
         }
         return node;
@@ -42,4 +43,10 @@ choco.dom.massAppend = function(children, element) {
     for (child in children) {
         element.appendChild(children[child]);
     }
+}
+/*
+ * @param element: which element to empty.
+ */
+choco.dom.emptyElement = function(element) {
+    element.innerHTML = "";
 }
