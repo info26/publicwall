@@ -46,6 +46,8 @@ choco.dom.massAppend = function(children, element) {
 }
 /*
  * @param element: which element to empty.
+ * does this by setting the innerHTML of the element to 
+ * nothing. 
  */
 choco.dom.emptyElement = function(element) {
     element.innerHTML = "";

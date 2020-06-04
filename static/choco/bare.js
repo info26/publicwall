@@ -4,7 +4,7 @@ choco.bare = {};
  * 's path it is currently running from. 
  * maybe a better way to do this? I don't know. */
 var path = document.currentScript.src.toString();
-choco.loadedPath_ = path.substring(0, path.lastIndexOf("/") + 1); // +1 to insure the last '/' is included in. 
+choco.loadedPath_ = path.substring(0, path.lastIndexOf("/") + 1); // +1 to insure the last '/' is included in. //
 /* 
  * keep a working list of the current modules
  * that are imported, to prevent
@@ -45,7 +45,7 @@ choco.BLANK_FUNC = function() {}
  * @param onloadfunc(function): callback after script has loaded. 
  * @param location(string): where to put the script tag
  * @return: appended script tag. 
- * this function prepares a <script> tag and appends it to the location of @param location. 
+ * this function prepares a <script> tag with .src @param url and appends it to the location of @param location. 
  */
 choco.bare.loadJS = function(url, onloadfunc, location){
     var scriptTag = document.createElement('script');
