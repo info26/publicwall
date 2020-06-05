@@ -52,3 +52,24 @@ choco.dom.massAppend = function(children, element) {
 choco.dom.emptyElement = function(element) {
     element.innerHTML = "";
 }
+/*
+ * @param attributes(object): the attributes to update key: the attribute name, value: the attribute value, 
+ * @param element(HTMLElement): the element to update the attributes on.
+ * Mass updates attributes. 
+ */
+choco.dom.massUpdateAttributes = function(attributes, element) {
+    for (attr in attributes) {
+        element.setAttribute(attr, attributes[attr]);
+    }
+}
+/*
+ * @param attributes(array): attributes to delete. 
+ * @param element(HTMLElement): the element to remove the attributes on. 
+ * mass removes attributes
+ */
+choco.dom.massDeleteAttributes = function(attributes, element) {
+    for (attr in attributes) {
+        refAttr = attributes[attr];
+        element.removeAttribute(refAttr);
+    }
+}

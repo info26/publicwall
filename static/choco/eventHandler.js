@@ -18,6 +18,7 @@ choco.events.eventHandler = class {
         if (event in this.eventHooks == false) {
             this.eventHooks[event] = [];
         }
+        // add to event hooks. 
         this.eventHooks[event].push([callback, data]);
     }
     /* 
